@@ -1,0 +1,20 @@
+{
+  "name": "@autopay/sdk",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "repository": "https://github.com/nibbus0x/autopay",
+  "author": "nibbus0x",
+  "license": "MIT",
+  "scripts": {
+    "fmt": "prettier --write ./src"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.27.0",
+    "@solana/spl-token": "^0.3.7",
+    "@solana/web3.js": "^1.74.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1",
+    "typescript": "^5.0.3"
+  }
+}

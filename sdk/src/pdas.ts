@@ -1,5 +1,5 @@
-import { PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js";
 import {
   AUTOPAY_PROGRAM_ID,
   CLOCKWORK_THREAD_PROGRAM_ID,

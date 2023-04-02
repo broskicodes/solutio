@@ -12,7 +12,7 @@ import {
   updatePayment,
   cancelPayment,
   delegateTransferAuthority,
-} from "../../utils";
+} from "@autopay/sdk";
 import { assert } from "chai";
 import {
   createAssociatedTokenAccount,

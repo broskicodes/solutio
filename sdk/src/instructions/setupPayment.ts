@@ -1,13 +1,18 @@
 import { Program, BN } from "@coral-xyz/anchor";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { getTokenAuthPDA } from "../pdas";
+import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
+import { ThreadTrigger } from "../helpers";
+import { getThreadAuthorityPDA, getThreadPDA, getTokenAuthPDA } from "../pdas";
 
-export const delegateTransferAuthority = async (
+export const setupPayment = async (
+  client: Keypair,
   taOwner: Keypair,
   receiver: PublicKey,
   mint: PublicKey,
-  delAmnt: BN,
+  amount: BN,
+  threadId: number,
+  threadTrigger: ThreadTrigger,
   program: Program
 ) => {
   const ta = (
@@ -29,17 +34,25 @@ export const delegateTransferAuthority = async (
   ).address;
 
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
+  const [threadAuth] = getThreadAuthorityPDA(client.publicKey);
+  const [thread] = getThreadPDA(threadAuth, threadId);
 
-  await program.methods
-    .delegateTransferAuthority(delAmnt)
+  const ix = await program.methods
+    .setupNewPayment(amount, threadTrigger)
     .accounts({
-      newAuthority: taAuth,
+      tokenAccountAuthority: taAuth,
+      threadAuthority: threadAuth,
+      client: client.publicKey,
       mint,
       tokenAccount: ta,
       receiverTokenAccount: receiverTa,
       receiver: receiver,
       oldAuthority: taOwner.publicKey,
+      thread,
+      threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
     })
-    .signers([taOwner])
-    .rpc();
+    .signers([taOwner, client])
+    .instruction();
+
+    return ix;
 };

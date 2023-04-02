@@ -5,15 +5,15 @@ import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
 import { ThreadTrigger } from "../helpers";
 import { getThreadAuthorityPDA, getThreadPDA, getTokenAuthPDA } from "../pdas";
 
-export const setupPayment = async (
+export const updatePayment = async (
   client: Keypair,
   taOwner: Keypair,
   receiver: PublicKey,
   mint: PublicKey,
-  amount: BN,
   threadId: number,
-  threadTrigger: ThreadTrigger,
-  program: Program
+  program: Program,
+  newAmount: BN | null,
+  newSchedlue: ThreadTrigger | null
 ) => {
   const ta = (
     await getOrCreateAssociatedTokenAccount(
@@ -37,20 +37,34 @@ export const setupPayment = async (
   const [threadAuth] = getThreadAuthorityPDA(client.publicKey);
   const [thread] = getThreadPDA(threadAuth, threadId);
 
-  await program.methods
-    .setupNewPayment(amount, threadTrigger)
+  const optAcnts = newAmount
+    ? {
+        tokenAccountAuthority: taAuth,
+        mint,
+        tokenAccount: ta,
+        receiverTokenAccount: receiverTa,
+        receiver: receiver,
+        oldAuthority: taOwner.publicKey,
+      }
+    : {
+        tokenAccountAuthority: undefined,
+        mint: undefined,
+        tokenAccount: undefined,
+        receiverTokenAccount: undefined,
+        receiver: undefined,
+        oldAuthority: undefined,
+      };
+
+  const ix = await program.methods
+    .updatePayment(threadId, newSchedlue, newAmount)
     .accounts({
-      tokenAccountAuthority: taAuth,
       threadAuthority: threadAuth,
       client: client.publicKey,
-      mint,
-      tokenAccount: ta,
-      receiverTokenAccount: receiverTa,
-      receiver: receiver,
-      oldAuthority: taOwner.publicKey,
       thread,
       threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
+      ...optAcnts,
     })
-    .signers([taOwner, client])
-    .rpc();
+    .instruction();
+
+  return ix;
 };
