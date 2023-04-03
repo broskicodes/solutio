@@ -1,9 +1,9 @@
 import { PublicKey } from "@solana/web3.js";
 
 // Seeds
-export const THREAD = "thread";
-export const TOKEN_AUTHORITY = "token_authority";
-export const THREAD_AUTHORITY = "thread_authority";
+export const THREAD_SEED = Buffer.from("thread");
+export const TOKEN_AUTHORITY_SEED = Buffer.from("token_authority");
+export const THREAD_AUTHORITY_SEED = Buffer.from("thread_authority");
 
 // Pubkeys
 export const AUTOPAY_PROGRAM_ID = new PublicKey(

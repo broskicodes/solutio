@@ -3,18 +3,14 @@ import { PublicKey } from "@solana/web3.js";
 import {
   AUTOPAY_PROGRAM_ID,
   CLOCKWORK_THREAD_PROGRAM_ID,
-  THREAD,
-  THREAD_AUTHORITY,
-  TOKEN_AUTHORITY,
+  THREAD_SEED,
+  THREAD_AUTHORITY_SEED,
+  TOKEN_AUTHORITY_SEED,
 } from "./constants";
 
 export const getThreadPDA = (authority: PublicKey, id: BN) => {
   return PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(THREAD),
-      authority.toBuffer(),
-      new Uint8Array(id.toArray("le", 1)),
-    ],
+    [THREAD_SEED, authority.toBuffer(), new Uint8Array(id.toArray("le", 1))],
     CLOCKWORK_THREAD_PROGRAM_ID
   );
 };
@@ -26,7 +22,7 @@ export const getTokenAuthPDA = (
 ) => {
   return PublicKey.findProgramAddressSync(
     [
-      Buffer.from(TOKEN_AUTHORITY),
+      TOKEN_AUTHORITY_SEED,
       oldAuth.toBuffer(),
       tokenAccount.toBuffer(),
       receiverTokenAccount.toBuffer(),
@@ -37,7 +33,7 @@ export const getTokenAuthPDA = (
 
 export const getThreadAuthorityPDA = (client: PublicKey) => {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from(THREAD_AUTHORITY), client.toBuffer()],
+    [THREAD_AUTHORITY_SEED, client.toBuffer()],
     AUTOPAY_PROGRAM_ID
   );
 };

@@ -50,5 +50,5 @@ export const cancelPayment = async (
     })
     .instruction();
 
-    return ix;
+  return ix;
 };

@@ -1,5 +1,5 @@
 {
-  "name": "@autopay/sdk",
+  "name": "@soltility/autopay-sdk",
   "version": "0.1.0",
   "main": "src/index.ts",
   "repository": "https://github.com/nibbus0x/autopay",

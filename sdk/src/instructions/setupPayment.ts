@@ -54,5 +54,5 @@ export const setupPayment = async (
     .signers([taOwner, client])
     .instruction();
 
-    return ix;
+  return ix;
 };

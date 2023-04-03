@@ -1,14 +1,15 @@
 import { registerRootComponent } from "expo";
 import { RecoilRoot } from "recoil";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFonts, Inter_900Black } from "@expo-google-fonts/dev";
 
-import { ExamplesScreens } from "./screens/ExamplesScreen";
-import { HomeScreen } from "./screens/HomeScreen";
-import { TokenListNavigator } from "./screens/TokenNavigator";
+import { ExamplesScreens } from "./screens/NotificationsScreen";
+import { HomeScreen } from "./screens/SetupScreen";
+import { TokenListNavigator } from "./screens/ManageScreen";
+import './styles';
 
 const Tab = createBottomTabNavigator();
 
