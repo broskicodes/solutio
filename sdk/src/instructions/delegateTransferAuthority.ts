@@ -38,7 +38,7 @@ export const delegateTransferAuthority = async (
       tokenAccount: ta,
       receiverTokenAccount: receiverTa,
       receiver: receiver,
-      oldAuthority: taOwner.publicKey,
+      tokenAccountOwner: taOwner.publicKey,
     })
     .instruction();
 

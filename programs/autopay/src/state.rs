@@ -9,7 +9,7 @@ pub enum AcceptedTriggers {
 
 #[account]
 pub struct TokenAuthority {
-    pub old_authority: Pubkey,
+    pub token_account_owner: Pubkey,
     pub mint: Pubkey,
     pub token_account: Pubkey,
     pub receiver_token_account: Pubkey,
@@ -22,7 +22,7 @@ impl TokenAuthority {
 
 #[account]
 pub struct ThreadAuthority {
-    pub client: Pubkey,
+    pub token_account_owner: Pubkey,
     pub next_thread_id: u8,
 }
 

@@ -22,12 +22,12 @@ pub struct UpadtePayment<'info> {
         mut,
         seeds = [
             ThreadAuthority::SEED,
-            client.key().as_ref(),
+            token_account_owner.key().as_ref(),
         ],
         bump
     )]
     pub thread_authority: Account<'info, ThreadAuthority>,
-    pub client: Signer<'info>,
+    pub token_account_owner: Signer<'info>,
     /// CHECK: Seeds checked in constraint
     #[account(
         mut,
@@ -45,7 +45,7 @@ pub struct UpadtePayment<'info> {
     #[account(
         seeds = [
             TokenAuthority::SEED,
-            old_authority.as_ref().unwrap().key().as_ref(),
+            token_account_owner.as_ref().key().as_ref(),
             token_account.as_ref().unwrap().key().as_ref(),
             receiver_token_account.as_ref().unwrap().key().as_ref(),
         ],
@@ -57,7 +57,7 @@ pub struct UpadtePayment<'info> {
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = old_authority,
+        associated_token::authority = token_account_owner,
     )]
     pub token_account: Option<Account<'info, TokenAccount>>,
     // Need not be assosiated ta
@@ -68,7 +68,6 @@ pub struct UpadtePayment<'info> {
     )]
     pub receiver_token_account: Option<Account<'info, TokenAccount>>,
     pub receiver: Option<SystemAccount<'info>>,
-    pub old_authority: Option<Signer<'info>>,
     pub token_program: Option<Program<'info, Token>>,
     pub associated_token_program: Option<Program<'info, AssociatedToken>>,
 }
@@ -84,7 +83,7 @@ pub fn handler(
         .get("thread_authority")
         .ok_or(AutoPayError::MissingBump)?;
 
-    let client_pubkey = ctx.accounts.client.key();
+    let client_pubkey = ctx.accounts.token_account_owner.key();
     let thread_auth_seeds = &[
         ThreadAuthority::SEED,
         client_pubkey.as_ref(),
@@ -132,11 +131,10 @@ pub fn handler(
                     .receiver_token_account
                     .clone()
                     .ok_or(AutoPayError::MissingOptionalAccount)?,
-                old_authority: UncheckedAccount::try_from(
+                token_account_owner: UncheckedAccount::try_from(
                     ctx.accounts
-                        .old_authority
+                        .token_account_owner
                         .clone()
-                        .ok_or(AutoPayError::MissingOptionalAccount)?
                         .to_account_info(),
                 ),
                 receiver: ctx

@@ -6,7 +6,6 @@ import { ThreadTrigger } from "../helpers";
 import { getThreadAuthorityPDA, getThreadPDA, getTokenAuthPDA } from "../pdas";
 
 export const setupPayment = async (
-  client: Keypair,
   taOwner: Keypair,
   receiver: PublicKey,
   mint: PublicKey,
@@ -34,7 +33,7 @@ export const setupPayment = async (
   ).address;
 
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
-  const [threadAuth] = getThreadAuthorityPDA(client.publicKey);
+  const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
   const [thread] = getThreadPDA(threadAuth, threadId);
 
   const ix = await program.methods
@@ -42,16 +41,14 @@ export const setupPayment = async (
     .accounts({
       tokenAccountAuthority: taAuth,
       threadAuthority: threadAuth,
-      client: client.publicKey,
       mint,
       tokenAccount: ta,
       receiverTokenAccount: receiverTa,
       receiver: receiver,
-      oldAuthority: taOwner.publicKey,
+      tokenAccountOwner: taOwner.publicKey,
       thread,
       threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
     })
-    .signers([taOwner, client])
     .instruction();
 
   return ix;

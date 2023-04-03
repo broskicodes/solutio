@@ -24,7 +24,7 @@ pub struct SetupNewPayment<'info> {
     #[account(
         seeds = [
             TokenAuthority::SEED,
-            old_authority.key.as_ref(),
+            token_account_owner.key.as_ref(),
             token_account.key().as_ref(),
             receiver_token_account.key().as_ref(),
         ],
@@ -33,37 +33,35 @@ pub struct SetupNewPayment<'info> {
     pub token_account_authority: Account<'info, TokenAuthority>,
     #[account(
       init_if_needed,
-      payer = client,
+      payer = token_account_owner,
       space = ThreadAuthority::LEN,
       seeds = [
           ThreadAuthority::SEED,
-          client.key().as_ref(),
+          token_account_owner.key().as_ref(),
       ],
       bump
     )]
     pub thread_authority: Account<'info, ThreadAuthority>,
-    #[account(mut)]
-    pub client: Signer<'info>,
-    // TODO: Limit to Wrapped Sol or USDC
+    // TODO: Limit mint to Wrapped Sol or USDC
     pub mint: Account<'info, Mint>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = old_authority,
+        associated_token::authority = token_account_owner,
     )]
     pub token_account: Account<'info, TokenAccount>,
     // Need not be assosiated ta
     #[account(
         init_if_needed,
-        payer = old_authority,
+        payer = token_account_owner,
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
     pub receiver_token_account: Account<'info, TokenAccount>,
     pub receiver: SystemAccount<'info>,
     #[account(mut)]
-    pub old_authority: Signer<'info>,
+    pub token_account_owner: Signer<'info>,
     /// CHECK: Seeds checked in constraint
     #[account(
         mut,
@@ -90,10 +88,10 @@ pub fn handler(
     if !ctx
         .accounts
         .thread_authority
-        .client
-        .eq(ctx.accounts.client.key)
+        .token_account_owner
+        .eq(ctx.accounts.token_account_owner.key)
     {
-        ctx.accounts.thread_authority.client = ctx.accounts.client.key();
+        ctx.accounts.thread_authority.token_account_owner = ctx.accounts.token_account_owner.key();
         ctx.accounts.thread_authority.next_thread_id = 0;
     }
 
@@ -101,10 +99,10 @@ pub fn handler(
         .bumps
         .get("thread_authority")
         .ok_or(AutoPayError::MissingBump)?;
-    let client_pubkey = ctx.accounts.client.key();
+    let ta_owner_pubkey = ctx.accounts.token_account_owner.key();
     let thread_auth_seeds = &[
         ThreadAuthority::SEED,
-        client_pubkey.as_ref(),
+        ta_owner_pubkey.as_ref(),
         &[thread_auth_bump],
     ];
     let signer = &[&thread_auth_seeds[..]];
@@ -113,7 +111,7 @@ pub fn handler(
         ctx.accounts.thread_program.to_account_info(),
         ThreadCreate {
             authority: ctx.accounts.thread_authority.to_account_info(),
-            payer: ctx.accounts.client.to_account_info(),
+            payer: ctx.accounts.token_account_owner.to_account_info(),
             system_program: ctx.accounts.system_program.to_account_info(),
             thread: ctx.accounts.thread.to_account_info(),
         },
@@ -130,7 +128,7 @@ pub fn handler(
         mint: ctx.accounts.mint.clone(),
         token_account: ctx.accounts.token_account.clone(),
         receiver_token_account: ctx.accounts.receiver_token_account.clone(),
-        old_authority: UncheckedAccount::try_from(ctx.accounts.old_authority.to_account_info()),
+        token_account_owner: UncheckedAccount::try_from(ctx.accounts.token_account_owner.to_account_info()),
         receiver: ctx.accounts.receiver.clone(),
         system_program: ctx.accounts.system_program.clone(),
         token_program: ctx.accounts.token_program.clone(),

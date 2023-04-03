@@ -12,7 +12,7 @@ pub struct TransferTokens<'info> {
     #[account(
         seeds = [
             TokenAuthority::SEED,
-            old_authority.key.as_ref(),
+            token_account_owner.key.as_ref(),
             token_account.key().as_ref(),
             receiver_token_account.key().as_ref(),
         ],
@@ -24,7 +24,7 @@ pub struct TransferTokens<'info> {
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = old_authority,
+        associated_token::authority = token_account_owner,
     )]
     pub token_account: Account<'info, TokenAccount>,
     // Need not be assosiated ta
@@ -35,7 +35,7 @@ pub struct TransferTokens<'info> {
     )]
     pub receiver_token_account: Account<'info, TokenAccount>,
     /// CHECK: Account verified through seeds of other accounts
-    pub old_authority: UncheckedAccount<'info>,
+    pub token_account_owner: UncheckedAccount<'info>,
     pub receiver: SystemAccount<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -64,7 +64,7 @@ pub fn handler(ctx: Context<TransferTokens>, amount: u64) -> Result<()> {
         ],
         &[&[
             TokenAuthority::SEED,
-            ctx.accounts.old_authority.key.as_ref(),
+            ctx.accounts.token_account_owner.key.as_ref(),
             ctx.accounts.token_account.key().as_ref(),
             ctx.accounts.receiver_token_account.key().as_ref(),
             &[tok_auth_bump],

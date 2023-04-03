@@ -16,11 +16,6 @@
           "isSigner": false
         },
         {
-          "name": "client",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "mint",
           "isMut": false,
           "isSigner": false
@@ -41,7 +36,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -93,7 +88,7 @@
           "isSigner": false
         },
         {
-          "name": "client",
+          "name": "tokenAccountOwner",
           "isMut": false,
           "isSigner": true
         },
@@ -140,12 +135,6 @@
           "name": "receiver",
           "isMut": false,
           "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "oldAuthority",
-          "isMut": false,
-          "isSigner": true,
           "isOptional": true
         },
         {
@@ -191,11 +180,6 @@
           "isSigner": false
         },
         {
-          "name": "client",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "tokenAccountAuthority",
           "isMut": true,
           "isSigner": false
@@ -221,7 +205,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -267,7 +251,7 @@
           "isSigner": false
         },
         {
-          "name": "client",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -318,7 +302,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -364,7 +348,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": false,
           "isSigner": false
         },
@@ -404,7 +388,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "oldAuthority",
+            "name": "tokenAccountOwner",
             "type": "publicKey"
           },
           {
@@ -428,7 +412,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "client",
+            "name": "tokenAccountOwner",
             "type": "publicKey"
           },
           {
