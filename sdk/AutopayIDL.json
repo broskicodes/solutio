@@ -16,6 +16,11 @@
           "isSigner": false
         },
         {
+          "name": "payment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "mint",
           "isMut": false,
           "isSigner": false
@@ -84,6 +89,11 @@
       "accounts": [
         {
           "name": "threadAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payment",
           "isMut": true,
           "isSigner": false
         },
@@ -181,6 +191,11 @@
         },
         {
           "name": "tokenAccountAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payment",
           "isMut": true,
           "isSigner": false
         },
@@ -315,6 +330,11 @@
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -421,6 +441,58 @@
           }
         ]
       }
+    },
+    {
+      "name": "Payment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "threadAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "threadKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "threadId",
+            "type": "u8"
+          },
+          {
+            "name": "payer",
+            "type": "publicKey"
+          },
+          {
+            "name": "receiver",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "PaymentStatus"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "schedule",
+            "type": {
+              "defined": "AcceptedTriggers"
+            }
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -437,9 +509,31 @@
             "fields": [
               {
                 "name": "schedule_str",
-                "type": "string"
+                "type": {
+                  "array": [
+                    "u8",
+                    128
+                  ]
+                }
               }
             ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaymentStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Complete"
           }
         ]
       }
@@ -468,6 +562,6 @@
     }
   ],
   "metadata": {
-    "address": "5FLhLmmJFpLeKyqwHC34bmELNLZFutKTqdxtqmimiMSo"
+    "address": "pay5dFq6RiQ82amh7Axkmkh17L1pYY1u7cfXBE3sZmY"
   }
 }

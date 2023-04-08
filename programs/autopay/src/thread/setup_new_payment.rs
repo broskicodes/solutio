@@ -1,6 +1,6 @@
 use crate::{
     error::AutoPayError,
-    state::{AcceptedTriggers, ThreadAuthority, TokenAuthority},
+    state::{AcceptedTriggers, Payment, PaymentStatus, ThreadAuthority, TokenAuthority},
     util::verify_trigger,
 };
 
@@ -16,9 +16,6 @@ use clockwork_sdk::{
 };
 use clockwork_thread_program::{state::SEED_THREAD, ID as THREAD_PROGRAM_ID};
 
-// Create state account to track all threads created by a given address
-// Init if needed and store next thread id
-
 #[derive(Accounts)]
 pub struct SetupNewPayment<'info> {
     #[account(
@@ -30,7 +27,7 @@ pub struct SetupNewPayment<'info> {
         ],
         bump
     )]
-    pub token_account_authority: Account<'info, TokenAuthority>,
+    pub token_account_authority: Box<Account<'info, TokenAuthority>>,
     #[account(
       init_if_needed,
       payer = token_account_owner,
@@ -41,16 +38,28 @@ pub struct SetupNewPayment<'info> {
       ],
       bump
     )]
-    pub thread_authority: Account<'info, ThreadAuthority>,
+    pub thread_authority: Box<Account<'info, ThreadAuthority>>,
+    #[account(
+        init,
+        payer = token_account_owner,
+        space = Payment::LEN,
+        seeds = [
+            Payment::SEED,
+            token_account_owner.key().as_ref(),
+            thread.key().as_ref()
+        ],
+        bump
+    )]
+    pub payment: Box<Account<'info, Payment>>,
     // TODO: Limit mint to Wrapped Sol or USDC
-    pub mint: Account<'info, Mint>,
+    pub mint: Box<Account<'info, Mint>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = token_account_owner,
     )]
-    pub token_account: Account<'info, TokenAccount>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
     // Need not be assosiated ta
     #[account(
         init_if_needed,
@@ -58,7 +67,7 @@ pub struct SetupNewPayment<'info> {
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
-    pub receiver_token_account: Account<'info, TokenAccount>,
+    pub receiver_token_account: Box<Account<'info, TokenAccount>>,
     pub receiver: SystemAccount<'info>,
     #[account(mut)]
     pub token_account_owner: Signer<'info>,
@@ -118,7 +127,7 @@ pub fn handler(
         signer,
     );
 
-    let trigger = verify_trigger(thread_trigger)?;
+    let trigger = verify_trigger(thread_trigger.clone())?;
     let kickoff_ix_data = crate::instruction::TransferTokens {
         amount: transfer_amount,
     };
@@ -128,7 +137,9 @@ pub fn handler(
         mint: ctx.accounts.mint.clone(),
         token_account: ctx.accounts.token_account.clone(),
         receiver_token_account: ctx.accounts.receiver_token_account.clone(),
-        token_account_owner: UncheckedAccount::try_from(ctx.accounts.token_account_owner.to_account_info()),
+        token_account_owner: UncheckedAccount::try_from(
+            ctx.accounts.token_account_owner.to_account_info(),
+        ),
         receiver: ctx.accounts.receiver.clone(),
         system_program: ctx.accounts.system_program.clone(),
         token_program: ctx.accounts.token_program.clone(),
@@ -151,11 +162,23 @@ pub fn handler(
 
     thread_create(
         cpi_ctx,
-        1000000000, // Justify this amount
+        100000000, // Justify this amount
         vec![ctx.accounts.thread_authority.next_thread_id],
         vec![kickoff_ix],
         trigger,
     )?;
+
+    let payment = &mut ctx.accounts.payment;
+    payment.thread_authority = ctx.accounts.thread_authority.key();
+    payment.token_authority = ctx.accounts.token_account_authority.key();
+    payment.thread_key = ctx.accounts.thread.key();
+    payment.thread_id = ctx.accounts.thread_authority.next_thread_id;
+    payment.payer = ctx.accounts.token_account_owner.key();
+    payment.receiver = ctx.accounts.receiver.key();
+    payment.mint = ctx.accounts.mint.key();
+    payment.status = PaymentStatus::Active; // Should set to Complete if trigger = Now?
+    payment.amount = transfer_amount;
+    payment.schedule = thread_trigger.clone();
 
     ctx.accounts.thread_authority.next_thread_id += 1;
 

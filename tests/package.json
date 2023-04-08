@@ -3,9 +3,9 @@
         "fmt": "prettier --write ./"
     },
     "dependencies": {
-        "@autopay/sdk": "0.1.0",
         "@coral-xyz/anchor": "^0.27.0",
-        "@solana/web3.js": "^1.74.0"
+        "@solana/web3.js": "^1.74.0",
+        "@soltility/autopay-sdk": "0.1.0"
     },
     "devDependencies": {
         "@types/chai": "^4.3.0",

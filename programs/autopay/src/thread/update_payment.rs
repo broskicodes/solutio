@@ -1,6 +1,6 @@
 use crate::{
     error::AutoPayError,
-    state::{AcceptedTriggers, ThreadAuthority, TokenAuthority},
+    state::{AcceptedTriggers, Payment, ThreadAuthority, TokenAuthority},
     util::verify_trigger,
 };
 use anchor_lang::{prelude::*, InstructionData};
@@ -26,7 +26,17 @@ pub struct UpadtePayment<'info> {
         ],
         bump
     )]
-    pub thread_authority: Account<'info, ThreadAuthority>,
+    pub thread_authority: Box<Account<'info, ThreadAuthority>>,
+    #[account(
+        mut,
+        seeds = [
+            Payment::SEED,
+            token_account_owner.key().as_ref(),
+            thread.key().as_ref()
+        ],
+        bump
+    )]
+    pub payment: Box<Account<'info, Payment>>,
     pub token_account_owner: Signer<'info>,
     /// CHECK: Seeds checked in constraint
     #[account(
@@ -51,22 +61,22 @@ pub struct UpadtePayment<'info> {
         ],
         bump
     )]
-    pub token_account_authority: Option<Account<'info, TokenAuthority>>,
-    pub mint: Option<Account<'info, Mint>>,
+    pub token_account_authority: Option<Box<Account<'info, TokenAuthority>>>,
+    pub mint: Option<Box<Account<'info, Mint>>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = token_account_owner,
     )]
-    pub token_account: Option<Account<'info, TokenAccount>>,
+    pub token_account: Option<Box<Account<'info, TokenAccount>>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
-    pub receiver_token_account: Option<Account<'info, TokenAccount>>,
+    pub receiver_token_account: Option<Box<Account<'info, TokenAccount>>>,
     pub receiver: Option<SystemAccount<'info>>,
     pub token_program: Option<Program<'info, Token>>,
     pub associated_token_program: Option<Program<'info, AssociatedToken>>,
@@ -102,12 +112,16 @@ pub fn handler(
     );
 
     let trigger = match new_trigger {
-        Some(t) => Some(verify_trigger(t)?),
+        Some(t) => {
+            ctx.accounts.payment.schedule = t.clone();
+            Some(verify_trigger(t.clone())?)
+        }
         None => None,
     };
 
     let new_ixs = match new_transfer_amount {
         Some(amnt) => {
+            ctx.accounts.payment.amount = amnt;
             let ix_data = crate::instruction::TransferTokens { amount: amnt };
 
             let acnts = crate::token::TransferTokens {
@@ -132,10 +146,7 @@ pub fn handler(
                     .clone()
                     .ok_or(AutoPayError::MissingOptionalAccount)?,
                 token_account_owner: UncheckedAccount::try_from(
-                    ctx.accounts
-                        .token_account_owner
-                        .clone()
-                        .to_account_info(),
+                    ctx.accounts.token_account_owner.clone().to_account_info(),
                 ),
                 receiver: ctx
                     .accounts

@@ -1,17 +1,18 @@
 [features]
 seeds = false
-[programs.localnet]
-autopay = "5FLhLmmJFpLeKyqwHC34bmELNLZFutKTqdxtqmimiMSo"
+[programs.devnet]
+autopay = "pay5dFq6RiQ82amh7Axkmkh17L1pYY1u7cfXBE3sZmY"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/home/braeden/.config/solana/devnet.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*test.ts"
+cp-idl = "cp target/idl/autopay.json sdk/AutopayIDL.json"
 
 # [[test.genesis]]
 # address = "6chEwh4WPk85uD9Z6SxfmBgjywwFhF6q3mP1Vp6s9bWE"

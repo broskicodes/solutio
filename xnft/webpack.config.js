@@ -6,7 +6,12 @@ module.exports = async function (env, argv) {
     {
       ...env,
       babel: {
-        dangerouslyAddModulePathsToTranspile: ["nativewind"],
+        dangerouslyAddModulePathsToTranspile: [
+          "nativewind",
+          "@solana/web3.js",
+          "@solana/spl-token",
+          "@coral-xyz/anchor",
+        ],
       },
     },
     argv
@@ -17,5 +22,11 @@ module.exports = async function (env, argv) {
     use: ["postcss-loader"],
   });
 
+  config.module.rules.push({
+    test: /\.mjs$/,
+    include: /node_modules/,
+    type: "javascript/auto",
+  });
+  
   return config;
 };

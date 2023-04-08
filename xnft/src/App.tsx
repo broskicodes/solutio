@@ -6,10 +6,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFonts, Inter_900Black } from "@expo-google-fonts/dev";
 
-import { ExamplesScreens } from "./screens/NotificationsScreen";
+import { NotificationsScreen } from "./screens/NotificationsScreen";
 import { HomeScreen } from "./screens/SetupScreen";
-import { TokenListNavigator } from "./screens/ManageScreen";
-import './styles';
+// import { TokenListNavigator } from "./screens/ManageScreen";
+import "./styles";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +31,7 @@ function TabNavigator() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="List"
         component={TokenListNavigator}
         options={{
@@ -41,14 +41,14 @@ function TabNavigator() {
             <MaterialCommunityIcons name="bank" color={color} size={size} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
-        name="Examples"
-        component={ExamplesScreens}
+        name="Notifications"
+        component={NotificationsScreen}
         options={{
-          tabBarLabel: "Examples",
+          tabBarLabel: "Notifications",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
+            <MaterialCommunityIcons name="bell" color={color} size={size} />
           ),
         }}
       />

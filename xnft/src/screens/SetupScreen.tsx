@@ -1,31 +1,25 @@
-import { Text, FlatList } from "react-native";
-import tw from "twrnc";
-
+import { Button } from "react-native";
 import { Screen } from "../components/Screen";
+import { Section } from "../components/Section";
+import { Payments } from "../components/Payments";
+import { useState } from "react";
+import { NewPaymentScreen } from "./NewPaymentScreen";
 
 export function HomeScreen() {
-  const features = [
-    "tailwind",
-    "recoil",
-    "native styling",
-    "fetching code from an API",
-    "using a FlatList to render data",
-    "Image for both remote & local images",
-    "custom fonts",
-    "sign a transaction / message",
-    "theme hook with light/dark support",
-  ];
+  const [showPaymentScreen, setShowPaymentScreen] = useState(false);
 
   return (
     <Screen>
-      <Text style={tw`mb-4`}>
-        You'll find several examples of how to build xNFTs using react-native:
-      </Text>
-      <FlatList
-        data={features}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => <Text>- {item}</Text>}
+      <Section title="Scheduled Payments">
+        <Payments></Payments>
+      </Section>
+      <Button
+        onPress={() => {
+          setShowPaymentScreen(true);
+        }}
+        title="Create New Payment"
       />
+      {showPaymentScreen && <NewPaymentScreen />}
     </Screen>
   );
 }

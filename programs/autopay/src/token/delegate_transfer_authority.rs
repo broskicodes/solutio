@@ -1,5 +1,8 @@
 use anchor_lang::{prelude::*, solana_program::program::invoke};
-use anchor_spl::token::{Mint, Token, TokenAccount};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token::{Mint, Token, TokenAccount},
+};
 use spl_token::instruction::approve;
 
 use crate::state::TokenAuthority;
@@ -19,27 +22,29 @@ pub struct DelegateTransferAuthority<'info> {
         ],
         bump
     )]
-    pub new_authority: Account<'info, TokenAuthority>,
-    pub mint: Account<'info, Mint>,
+    pub new_authority: Box<Account<'info, TokenAuthority>>,
+    pub mint: Box<Account<'info, Mint>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = token_account_owner,
     )]
-    pub token_account: Account<'info, TokenAccount>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
     // Need not be assosiated ta
     #[account(
-        mut,
+        init_if_needed,
+        payer = token_account_owner,
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
-    pub receiver_token_account: Account<'info, TokenAccount>,
+    pub receiver_token_account: Box<Account<'info, TokenAccount>>,
     pub receiver: SystemAccount<'info>,
     #[account(mut)]
     pub token_account_owner: Signer<'info>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 pub fn handler(ctx: Context<DelegateTransferAuthority>, amount: u64) -> Result<()> {

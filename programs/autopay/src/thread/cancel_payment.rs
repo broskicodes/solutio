@@ -1,6 +1,6 @@
 use crate::{
     error::AutoPayError,
-    state::{ThreadAuthority, TokenAuthority},
+    state::{Payment, PaymentStatus, ThreadAuthority, TokenAuthority},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -23,7 +23,7 @@ pub struct CancelPayment<'info> {
         ],
         bump
     )]
-    pub thread_authority: Account<'info, ThreadAuthority>,
+    pub thread_authority: Box<Account<'info, ThreadAuthority>>,
     #[account(
         mut,
         seeds = [
@@ -33,24 +33,33 @@ pub struct CancelPayment<'info> {
             receiver_token_account.key().as_ref(),
         ],
         bump,
-        close = token_account_owner,
     )]
-    pub token_account_authority: Account<'info, TokenAuthority>,
-    pub mint: Account<'info, Mint>,
+    pub token_account_authority: Box<Account<'info, TokenAuthority>>,
+    #[account(
+        mut,
+        seeds = [
+            Payment::SEED,
+            token_account_owner.key().as_ref(),
+            thread.key().as_ref()
+        ],
+        bump
+    )]
+    pub payment: Box<Account<'info, Payment>>,
+    pub mint: Box<Account<'info, Mint>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = token_account_owner,
     )]
-    pub token_account: Account<'info, TokenAccount>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
-    pub receiver_token_account: Account<'info, TokenAccount>,
+    pub receiver_token_account: Box<Account<'info, TokenAccount>>,
     pub receiver: SystemAccount<'info>,
     #[account(mut)]
     pub token_account_owner: Signer<'info>,
@@ -97,6 +106,8 @@ pub fn handler(ctx: Context<CancelPayment>, _thread_id: u8) -> Result<()> {
     );
 
     thread_delete(cpi_ctx)?;
+
+    ctx.accounts.payment.status = PaymentStatus::Cancelled;
 
     Ok(())
 }

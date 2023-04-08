@@ -18,22 +18,22 @@ pub struct TransferTokens<'info> {
         ],
         bump
     )]
-    pub token_account_authority: Account<'info, TokenAuthority>,
-    pub mint: Account<'info, Mint>,
+    pub token_account_authority: Box<Account<'info, TokenAuthority>>,
+    pub mint: Box<Account<'info, Mint>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = token_account_owner,
     )]
-    pub token_account: Account<'info, TokenAccount>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
-    pub receiver_token_account: Account<'info, TokenAccount>,
+    pub receiver_token_account: Box<Account<'info, TokenAccount>>,
     /// CHECK: Account verified through seeds of other accounts
     pub token_account_owner: UncheckedAccount<'info>,
     pub receiver: SystemAccount<'info>,
