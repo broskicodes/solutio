@@ -9,13 +9,16 @@ import {
   sleep,
 } from "@soltility/autopay-sdk";
 import { BaseSyntheticEvent, useState } from "react";
-import { Button, TextInput } from "react-native";
-import { Screen } from "../components/Screen";
+import { Button, TextInput, View } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
 import { signAndSendTransaction } from "../utils";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
-export const NewPaymentScreen = () => {
+interface NewPaymentProps {
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
   const provider = useSolanaProvider();
   const program = useAnchorProgram();
   const [receiver, setReceiver] = useState("");
@@ -55,10 +58,10 @@ export const NewPaymentScreen = () => {
       return;
     }
 
-    const receiverKey = new PublicKey(receiver);
-    // const receiverKey = new PublicKey("CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd");
-    const mintKey = new PublicKey(mintAddress);
-    // const mintKey = new PublicKey("JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj");
+    // const receiverKey = new PublicKey(receiver);
+    const receiverKey = new PublicKey("CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd");
+    // const mintKey = new PublicKey(mintAddress);
+    const mintKey = new PublicKey("JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj");
 
     const ixs: TransactionInstruction[] = [];
 
@@ -105,11 +108,12 @@ export const NewPaymentScreen = () => {
     );
 
     const sig = await signAndSendTransaction(ixs, provider);
+    setShowModal(false);
     console.log(sig);
   };
 
   return (
-    <Screen>
+    <View>
       <TextInput value={receiver} onChange={updateReceiver} />
       {/* Change to <select> */}
       <TextInput value={mintAddress} onChange={updateMintAddress} />
@@ -123,6 +127,6 @@ export const NewPaymentScreen = () => {
       />
 
       <Button onPress={sendTx} title="Send Tx" />
-    </Screen>
+    </View>
   );
 };

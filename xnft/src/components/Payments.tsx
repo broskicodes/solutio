@@ -1,11 +1,24 @@
 import { cancelPayment } from "@soltility/autopay-sdk";
 import { useEffect, useState } from "react";
-import { View, Text, Button } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
 import { PaymentType } from "@soltility/autopay-sdk";
 import { signAndSendTransaction } from "../utils";
+import { HomeScreenProps, HomeStackParamList } from "../utils/navigators";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-export const Payments = () => {
+interface PaymentsProps {
+  navigate: NativeStackNavigationProp<HomeStackParamList, 'Home'>['navigate'],
+  goBack: NativeStackNavigationProp<HomeStackParamList, 'Home'>['goBack']
+}
+
+export const Payments = ({ navigate }: PaymentsProps) => {
   const provider = useSolanaProvider();
   const program = useAnchorProgram();
   const [payments, setPayments] = useState<PaymentType[]>([]);
@@ -61,40 +74,40 @@ export const Payments = () => {
 
   return (
     <View>
-      {payments.map((payment) => {
-        return (
-          <View key={payment.threadKey.toBase58()}>
-            <Text>Mint: {payment.mint.toBase58()}</Text>
-            <Text>Receiver: {payment.receiver.toBase58()}</Text>
-            <Text>Amount: {payment.amount.toNumber()}</Text>
-            <Text>
-              {payment.schedule.now
-                ? "Now"
-                : payment.schedule.cron?.scheduleStr}
-            </Text>
-            <Text>
-              Status:{" "}
-              {payment.status.active
-                ? "Active"
-                : payment.status.cancelled
-                ? "Cancelled"
-                : "Complete"}
-            </Text>
-            <Button
-              onPress={() => {
-                /* Open <Payment> */
-              }}
-              title={"edit"}
-            />
-            <Button
-              onPress={() => {
-                cancelExistigPayment(payment);
-              }}
-              title={"cancel"}
-            />
-          </View>
-        );
-      })}
+      <FlatList
+        data={payments}
+        keyExtractor={(item) => item.threadKey.toBase58()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              navigate('Payment', { payment: item })
+            }}
+          >
+            <View>
+              <Text>Mint: {item.mint.toBase58()}</Text>
+              <Text>Receiver: {item.receiver.toBase58()}</Text>
+              <Text>Amount: {item.amount.toNumber()}</Text>
+              <Text>
+                {item.schedule.now ? "Now" : item.schedule.cron?.scheduleStr}
+              </Text>
+              <Text>
+                Status:{" "}
+                {item.status.active
+                  ? "Active"
+                  : item.status.cancelled
+                  ? "Cancelled"
+                  : "Complete"}
+              </Text>
+              <Button
+                onPress={() => {
+                  cancelExistigPayment(item);
+                }}
+                title={"cancel"}
+              />
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 };
