@@ -10,13 +10,13 @@ pub struct DepositToPaymentThread<'info> {
     #[account(
         seeds = [
             ThreadAuthority::SEED,
-            client.key().as_ref(),
+            token_account_owner.key().as_ref(),
         ],
         bump
     )]
-    pub thread_authority: Account<'info, ThreadAuthority>,
+    pub thread_authority: Box<Account<'info, ThreadAuthority>>,
     #[account(mut)]
-    pub client: Signer<'info>,
+    pub token_account_owner: Signer<'info>,
     /// CHECK: Seeds checked in constraint
     #[account(
         mut,
@@ -34,9 +34,13 @@ pub struct DepositToPaymentThread<'info> {
 
 pub fn handler(ctx: Context<DepositToPaymentThread>, amount: u64) -> Result<()> {
     invoke(
-        &transfer(ctx.accounts.client.key, ctx.accounts.thread.key, amount),
+        &transfer(
+            ctx.accounts.token_account_owner.key,
+            ctx.accounts.thread.key,
+            amount,
+        ),
         &[
-            ctx.accounts.client.to_account_info(),
+            ctx.accounts.token_account_owner.to_account_info(),
             ctx.accounts.thread.to_account_info(),
         ],
     )?;

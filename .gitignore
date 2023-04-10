@@ -7,3 +7,5 @@ node_modules
 test-ledger
 logs.out
 migrations
+use-cases.txt
+yarn-error.log

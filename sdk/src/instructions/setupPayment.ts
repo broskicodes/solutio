@@ -1,13 +1,18 @@
 import { Program, BN } from "@coral-xyz/anchor";
-import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
+import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
 import { ThreadTrigger } from "../helpers";
-import { getThreadAuthorityPDA, getThreadPDA, getTokenAuthPDA } from "../pdas";
+import {
+  getPaymentPDA,
+  getThreadAuthorityPDA,
+  getThreadPDA,
+  getTokenAuthPDA,
+} from "../pdas";
 
 export const setupPayment = async (
-  client: Keypair,
-  taOwner: Keypair,
+  taOwner: Keypair | Wallet,
   receiver: PublicKey,
   mint: PublicKey,
   amount: BN,
@@ -15,44 +20,30 @@ export const setupPayment = async (
   threadTrigger: ThreadTrigger,
   program: Program
 ) => {
-  const ta = (
-    await getOrCreateAssociatedTokenAccount(
-      program.provider.connection,
-      taOwner,
-      mint,
-      taOwner.publicKey
-    )
-  ).address;
-
-  const receiverTa = (
-    await getOrCreateAssociatedTokenAccount(
-      program.provider.connection,
-      taOwner,
-      mint,
-      receiver
-    )
-  ).address;
+  const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
+  const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  const mintData = await getMint(program.provider.connection, mint);
 
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
-  const [threadAuth] = getThreadAuthorityPDA(client.publicKey);
+  const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
   const [thread] = getThreadPDA(threadAuth, threadId);
+  const [payment] = getPaymentPDA(taOwner.publicKey, thread);
 
   const ix = await program.methods
-    .setupNewPayment(amount, threadTrigger)
+    .setupNewPayment(amount.muln(mintData.decimals), threadTrigger)
     .accounts({
       tokenAccountAuthority: taAuth,
       threadAuthority: threadAuth,
-      client: client.publicKey,
+      payment,
       mint,
       tokenAccount: ta,
       receiverTokenAccount: receiverTa,
-      receiver: receiver,
-      oldAuthority: taOwner.publicKey,
+      receiver,
+      tokenAccountOwner: taOwner.publicKey,
       thread,
       threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
     })
-    .signers([taOwner, client])
     .instruction();
 
-    return ix;
+  return ix;
 };

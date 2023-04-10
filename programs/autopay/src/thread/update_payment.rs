@@ -1,6 +1,6 @@
 use crate::{
     error::AutoPayError,
-    state::{AcceptedTriggers, ThreadAuthority, TokenAuthority},
+    state::{AcceptedTriggers, Payment, ThreadAuthority, TokenAuthority},
     util::verify_trigger,
 };
 use anchor_lang::{prelude::*, InstructionData};
@@ -22,12 +22,22 @@ pub struct UpadtePayment<'info> {
         mut,
         seeds = [
             ThreadAuthority::SEED,
-            client.key().as_ref(),
+            token_account_owner.key().as_ref(),
         ],
         bump
     )]
-    pub thread_authority: Account<'info, ThreadAuthority>,
-    pub client: Signer<'info>,
+    pub thread_authority: Box<Account<'info, ThreadAuthority>>,
+    #[account(
+        mut,
+        seeds = [
+            Payment::SEED,
+            token_account_owner.key().as_ref(),
+            thread.key().as_ref()
+        ],
+        bump
+    )]
+    pub payment: Box<Account<'info, Payment>>,
+    pub token_account_owner: Signer<'info>,
     /// CHECK: Seeds checked in constraint
     #[account(
         mut,
@@ -45,30 +55,29 @@ pub struct UpadtePayment<'info> {
     #[account(
         seeds = [
             TokenAuthority::SEED,
-            old_authority.as_ref().unwrap().key().as_ref(),
+            token_account_owner.as_ref().key().as_ref(),
             token_account.as_ref().unwrap().key().as_ref(),
             receiver_token_account.as_ref().unwrap().key().as_ref(),
         ],
         bump
     )]
-    pub token_account_authority: Option<Account<'info, TokenAuthority>>,
-    pub mint: Option<Account<'info, Mint>>,
+    pub token_account_authority: Option<Box<Account<'info, TokenAuthority>>>,
+    pub mint: Option<Box<Account<'info, Mint>>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = old_authority,
+        associated_token::authority = token_account_owner,
     )]
-    pub token_account: Option<Account<'info, TokenAccount>>,
+    pub token_account: Option<Box<Account<'info, TokenAccount>>>,
     // Need not be assosiated ta
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = receiver,
     )]
-    pub receiver_token_account: Option<Account<'info, TokenAccount>>,
+    pub receiver_token_account: Option<Box<Account<'info, TokenAccount>>>,
     pub receiver: Option<SystemAccount<'info>>,
-    pub old_authority: Option<Signer<'info>>,
     pub token_program: Option<Program<'info, Token>>,
     pub associated_token_program: Option<Program<'info, AssociatedToken>>,
 }
@@ -84,7 +93,7 @@ pub fn handler(
         .get("thread_authority")
         .ok_or(AutoPayError::MissingBump)?;
 
-    let client_pubkey = ctx.accounts.client.key();
+    let client_pubkey = ctx.accounts.token_account_owner.key();
     let thread_auth_seeds = &[
         ThreadAuthority::SEED,
         client_pubkey.as_ref(),
@@ -103,12 +112,16 @@ pub fn handler(
     );
 
     let trigger = match new_trigger {
-        Some(t) => Some(verify_trigger(t)?),
+        Some(t) => {
+            ctx.accounts.payment.schedule = t.clone();
+            Some(verify_trigger(t.clone())?)
+        }
         None => None,
     };
 
     let new_ixs = match new_transfer_amount {
         Some(amnt) => {
+            ctx.accounts.payment.amount = amnt;
             let ix_data = crate::instruction::TransferTokens { amount: amnt };
 
             let acnts = crate::token::TransferTokens {
@@ -132,12 +145,8 @@ pub fn handler(
                     .receiver_token_account
                     .clone()
                     .ok_or(AutoPayError::MissingOptionalAccount)?,
-                old_authority: UncheckedAccount::try_from(
-                    ctx.accounts
-                        .old_authority
-                        .clone()
-                        .ok_or(AutoPayError::MissingOptionalAccount)?
-                        .to_account_info(),
+                token_account_owner: UncheckedAccount::try_from(
+                    ctx.accounts.token_account_owner.clone().to_account_info(),
                 ),
                 receiver: ctx
                     .accounts

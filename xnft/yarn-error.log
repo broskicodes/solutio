@@ -1,5 +1,5 @@
 Arguments: 
-  /home/braeden/.nvm/versions/node/v16.18.0/bin/node /usr/share/yarn/bin/yarn.js install
+  /home/braeden/.nvm/versions/node/v16.18.0/bin/node /usr/share/yarn/bin/yarn.js add nativewind
 
 PATH: 
   /home/braeden/.local/share/solana/install/active_release/bin:/home/braeden/.nvm/versions/node/v16.18.0/bin:/home/braeden/.cargo/bin:/home/braeden/.local/share/solana/install/active_release/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/braeden/.npm-packages/bin:/home/braeden/.npm-packages/bin

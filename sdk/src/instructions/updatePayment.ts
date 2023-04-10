@@ -1,13 +1,18 @@
 import { Program, BN } from "@coral-xyz/anchor";
-import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
+import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
 import { ThreadTrigger } from "../helpers";
-import { getThreadAuthorityPDA, getThreadPDA, getTokenAuthPDA } from "../pdas";
+import {
+  getPaymentPDA,
+  getThreadAuthorityPDA,
+  getThreadPDA,
+  getTokenAuthPDA,
+} from "../pdas";
 
 export const updatePayment = async (
-  client: Keypair,
-  taOwner: Keypair,
+  taOwner: Keypair | Wallet,
   receiver: PublicKey,
   mint: PublicKey,
   threadId: number,
@@ -15,27 +20,18 @@ export const updatePayment = async (
   newAmount: BN | null,
   newSchedlue: ThreadTrigger | null
 ) => {
-  const ta = (
-    await getOrCreateAssociatedTokenAccount(
-      program.provider.connection,
-      taOwner,
-      mint,
-      taOwner.publicKey
-    )
-  ).address;
-
-  const receiverTa = (
-    await getOrCreateAssociatedTokenAccount(
-      program.provider.connection,
-      taOwner,
-      mint,
-      receiver
-    )
-  ).address;
-
+  const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
+  const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  
+  if (newAmount) {
+    const mintData = await getMint(program.provider.connection, mint);
+    newAmount = newAmount.muln(mintData.decimals);
+  }
+  
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
-  const [threadAuth] = getThreadAuthorityPDA(client.publicKey);
+  const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
   const [thread] = getThreadPDA(threadAuth, threadId);
+  const [payment] = getPaymentPDA(taOwner.publicKey, thread);
 
   const optAcnts = newAmount
     ? {
@@ -43,8 +39,7 @@ export const updatePayment = async (
         mint,
         tokenAccount: ta,
         receiverTokenAccount: receiverTa,
-        receiver: receiver,
-        oldAuthority: taOwner.publicKey,
+        receiver,
       }
     : {
         tokenAccountAuthority: undefined,
@@ -52,14 +47,14 @@ export const updatePayment = async (
         tokenAccount: undefined,
         receiverTokenAccount: undefined,
         receiver: undefined,
-        oldAuthority: undefined,
       };
 
   const ix = await program.methods
     .updatePayment(threadId, newSchedlue, newAmount)
     .accounts({
       threadAuthority: threadAuth,
-      client: client.publicKey,
+      payment,
+      tokenAccountOwner: taOwner.publicKey,
       thread,
       threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
       ...optAcnts,

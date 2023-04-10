@@ -16,9 +16,9 @@
           "isSigner": false
         },
         {
-          "name": "client",
+          "name": "payment",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -41,7 +41,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -93,7 +93,12 @@
           "isSigner": false
         },
         {
-          "name": "client",
+          "name": "payment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccountOwner",
           "isMut": false,
           "isSigner": true
         },
@@ -140,12 +145,6 @@
           "name": "receiver",
           "isMut": false,
           "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "oldAuthority",
-          "isMut": false,
-          "isSigner": true,
           "isOptional": true
         },
         {
@@ -191,12 +190,12 @@
           "isSigner": false
         },
         {
-          "name": "client",
+          "name": "tokenAccountAuthority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
-          "name": "tokenAccountAuthority",
+          "name": "payment",
           "isMut": true,
           "isSigner": false
         },
@@ -221,7 +220,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -267,7 +266,7 @@
           "isSigner": false
         },
         {
-          "name": "client",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -318,7 +317,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": true,
           "isSigner": true
         },
@@ -329,6 +328,11 @@
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -364,7 +368,7 @@
           "isSigner": false
         },
         {
-          "name": "oldAuthority",
+          "name": "tokenAccountOwner",
           "isMut": false,
           "isSigner": false
         },
@@ -404,7 +408,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "oldAuthority",
+            "name": "tokenAccountOwner",
             "type": "publicKey"
           },
           {
@@ -428,12 +432,64 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "client",
+            "name": "tokenAccountOwner",
             "type": "publicKey"
           },
           {
             "name": "nextThreadId",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Payment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "threadAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "threadKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "threadId",
+            "type": "u8"
+          },
+          {
+            "name": "payer",
+            "type": "publicKey"
+          },
+          {
+            "name": "receiver",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "PaymentStatus"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "schedule",
+            "type": {
+              "defined": "AcceptedTriggers"
+            }
           }
         ]
       }
@@ -453,9 +509,31 @@
             "fields": [
               {
                 "name": "schedule_str",
-                "type": "string"
+                "type": {
+                  "array": [
+                    "u8",
+                    128
+                  ]
+                }
               }
             ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaymentStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Complete"
           }
         ]
       }
@@ -482,8 +560,5 @@
       "name": "MissingOptionalAccount",
       "msg": "Context is missing a required account"
     }
-  ],
-  "metadata": {
-    "address": "5FLhLmmJFpLeKyqwHC34bmELNLZFutKTqdxtqmimiMSo"
-  }
+  ]
 }

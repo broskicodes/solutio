@@ -2,5 +2,6 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true
-  }
+  },
+  "exclude": ["webpack.config.js", "postcss.config.js", "tailwind.config.js"]
 }
