@@ -1,14 +1,14 @@
 [features]
 seeds = false
-[programs.devnet]
-autopay = "pay5dFq6RiQ82amh7Axkmkh17L1pYY1u7cfXBE3sZmY"
+[programs.mainnet]
+autopay = "2wPTyb77aTevaxD9jvKNQqo9MMLAMM9nGYACMoAZReaR"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "devnet"
-wallet = "/home/braeden/.config/solana/devnet.json"
+cluster = "mainnet"
+wallet = "usb://ledger?key=0"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*test.ts"

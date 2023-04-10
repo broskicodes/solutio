@@ -58,10 +58,10 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
       return;
     }
 
-    // const receiverKey = new PublicKey(receiver);
-    const receiverKey = new PublicKey("CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd");
-    // const mintKey = new PublicKey(mintAddress);
-    const mintKey = new PublicKey("JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj");
+    const receiverKey = new PublicKey(receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
+    // const receiverKey = new PublicKey("CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd");
+    const mintKey = new PublicKey(mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    // const mintKey = new PublicKey("JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj");
 
     const ixs: TransactionInstruction[] = [];
 

@@ -1,14 +1,14 @@
 {
-  "name": "xNFT Quickstart",
-  "version": "0.0.1",
-  "storage": "",
-  "description": "React Native Example",
+  "name": "Autopay",
+  "version": "0.1.0",
+  "storage": "ipfs",
+  "description": "MVP for automatic payments",
   "website": "http://wao.gg",
   "kind": "app",
   "icon": {
     "md": "./assets/icon.png"
   },
-  "contact": "",
+  "contact": "https://twitter.com/nibbus0x",
   "screenshots": [
     "./assets/screenShot.png"
   ],

@@ -1,6 +1,6 @@
 import { Program, BN } from "@coral-xyz/anchor";
 import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { getTokenAuthPDA } from "../pdas";
 
@@ -12,13 +12,13 @@ export const delegateTransferAuthority = async (
   program: Program
 ) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
-
   const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  const mintData = await getMint(program.provider.connection, mint);
 
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
 
   const ix = await program.methods
-    .delegateTransferAuthority(delAmnt)
+    .delegateTransferAuthority(delAmnt.muln(mintData.decimals))
     .accounts({
       newAuthority: taAuth,
       mint,

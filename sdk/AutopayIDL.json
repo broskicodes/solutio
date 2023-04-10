@@ -560,8 +560,5 @@
       "name": "MissingOptionalAccount",
       "msg": "Context is missing a required account"
     }
-  ],
-  "metadata": {
-    "address": "pay5dFq6RiQ82amh7Axkmkh17L1pYY1u7cfXBE3sZmY"
-  }
+  ]
 }

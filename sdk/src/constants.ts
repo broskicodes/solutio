@@ -8,7 +8,7 @@ export const PAYMENT_SEED = Buffer.from("payment");
 
 // Pubkeys
 export const AUTOPAY_PROGRAM_ID = new PublicKey(
-  "pay5dFq6RiQ82amh7Axkmkh17L1pYY1u7cfXBE3sZmY"
+  "2wPTyb77aTevaxD9jvKNQqo9MMLAMM9nGYACMoAZReaR"
 );
 export const CLOCKWORK_THREAD_PROGRAM_ID = new PublicKey(
   "CLoCKyJ6DXBJqqu2VWx9RLbgnwwR6BMHHuyasVmfMzBh"

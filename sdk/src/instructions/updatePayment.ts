@@ -1,6 +1,6 @@
 import { Program, BN } from "@coral-xyz/anchor";
 import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
 import { ThreadTrigger } from "../helpers";
@@ -21,9 +21,13 @@ export const updatePayment = async (
   newSchedlue: ThreadTrigger | null
 ) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
-
   const receiverTa = await getAssociatedTokenAddress(mint, receiver);
-
+  
+  if (newAmount) {
+    const mintData = await getMint(program.provider.connection, mint);
+    newAmount = newAmount.muln(mintData.decimals);
+  }
+  
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
   const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
   const [thread] = getThreadPDA(threadAuth, threadId);
