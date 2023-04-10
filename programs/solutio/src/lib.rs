@@ -13,7 +13,7 @@ use crate::token::*;
 use anchor_lang::prelude::*;
 
 #[program]
-pub mod autopay {
+pub mod solutio {
     use super::*;
 
     pub fn setup_new_payment(

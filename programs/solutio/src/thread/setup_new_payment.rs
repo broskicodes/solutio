@@ -1,5 +1,5 @@
 use crate::{
-    error::AutoPayError,
+    error::SolutioError,
     state::{AcceptedTriggers, Payment, PaymentStatus, ThreadAuthority, TokenAuthority},
     util::verify_trigger,
 };
@@ -107,7 +107,7 @@ pub fn handler(
     let thread_auth_bump = *ctx
         .bumps
         .get("thread_authority")
-        .ok_or(AutoPayError::MissingBump)?;
+        .ok_or(SolutioError::MissingBump)?;
     let ta_owner_pubkey = ctx.accounts.token_account_owner.key();
     let thread_auth_seeds = &[
         ThreadAuthority::SEED,

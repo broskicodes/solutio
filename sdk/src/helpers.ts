@@ -1,7 +1,7 @@
 import { BN, Idl, Program, Provider } from "@coral-xyz/anchor";
 import { ComputeBudgetProgram, PublicKey, Connection } from "@solana/web3.js";
-import autopayIdl from "../AutopayIDL.json";
-import { AUTOPAY_PROGRAM_ID, NEXT_THREAD_ID_INDEX } from "./constants";
+import solutioIdl from "../SolutioIDL.json";
+import { SOLUTIO_PROGRAM_ID, NEXT_THREAD_ID_INDEX } from "./constants";
 
 export interface ThreadTrigger {
   now?: {};
@@ -28,7 +28,7 @@ export interface PaymentType {
 }
 
 export const getAutopayProgram = (provider: Provider): Program => {
-  return new Program(autopayIdl as Idl, AUTOPAY_PROGRAM_ID, provider);
+  return new Program(solutioIdl as Idl, SOLUTIO_PROGRAM_ID, provider);
 };
 
 export const airdrop = async (

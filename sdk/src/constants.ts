@@ -7,7 +7,7 @@ export const THREAD_AUTHORITY_SEED = Buffer.from("thread_authority");
 export const PAYMENT_SEED = Buffer.from("payment");
 
 // Pubkeys
-export const AUTOPAY_PROGRAM_ID = new PublicKey(
+export const SOLUTIO_PROGRAM_ID = new PublicKey(
   "2wPTyb77aTevaxD9jvKNQqo9MMLAMM9nGYACMoAZReaR"
 );
 export const CLOCKWORK_THREAD_PROGRAM_ID = new PublicKey(

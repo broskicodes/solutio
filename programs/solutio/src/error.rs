@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum AutoPayError {
+pub enum SolutioError {
     #[msg("Numerical Overflow")]
     NumericalOverflow,
     #[msg("Context is missing a required bump")]

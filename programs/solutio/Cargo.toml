@@ -1,13 +1,13 @@
 [package]
-name = "autopay"
-version = "0.1.0"
+name = "solutio"
+version = "0.1.1"
 description = "Created with Anchor"
 rust-version = "1.56"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "autopay"
+name = "solutio"
 
 [features]
 no-entrypoint = []

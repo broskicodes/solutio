@@ -1,5 +1,5 @@
 use crate::{
-    error::AutoPayError,
+    error::SolutioError,
     state::{AcceptedTriggers, Payment, ThreadAuthority, TokenAuthority},
     util::verify_trigger,
 };
@@ -91,7 +91,7 @@ pub fn handler(
     let thread_auth_bump = *ctx
         .bumps
         .get("thread_authority")
-        .ok_or(AutoPayError::MissingBump)?;
+        .ok_or(SolutioError::MissingBump)?;
 
     let client_pubkey = ctx.accounts.token_account_owner.key();
     let thread_auth_seeds = &[
@@ -129,22 +129,22 @@ pub fn handler(
                     .accounts
                     .token_account_authority
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
                 mint: ctx
                     .accounts
                     .mint
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
                 token_account: ctx
                     .accounts
                     .token_account
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
                 receiver_token_account: ctx
                     .accounts
                     .receiver_token_account
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
                 token_account_owner: UncheckedAccount::try_from(
                     ctx.accounts.token_account_owner.clone().to_account_info(),
                 ),
@@ -152,18 +152,18 @@ pub fn handler(
                     .accounts
                     .receiver
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
                 system_program: ctx.accounts.system_program.clone(),
                 token_program: ctx
                     .accounts
                     .token_program
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
                 associated_token_program: ctx
                     .accounts
                     .associated_token_program
                     .clone()
-                    .ok_or(AutoPayError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?,
             }
             .to_account_metas(None)
             .into_iter()

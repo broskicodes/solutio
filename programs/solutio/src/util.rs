@@ -1,4 +1,4 @@
-use crate::error::AutoPayError;
+use crate::error::SolutioError;
 use crate::state::AcceptedTriggers;
 
 use anchor_lang::prelude::*;
@@ -13,7 +13,7 @@ pub fn verify_trigger(trigger: AcceptedTriggers) -> Result<Trigger> {
             let schedule =
                 Schedule::from_str(&std::str::from_utf8(schedule_str.as_slice()).unwrap())
                     .ok()
-                    .ok_or(AutoPayError::InvalidScheduleString)?;
+                    .ok_or(SolutioError::InvalidScheduleString)?;
 
             Ok(Trigger::Cron {
                 schedule: schedule.to_string(),

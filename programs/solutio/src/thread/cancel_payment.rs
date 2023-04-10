@@ -1,5 +1,5 @@
 use crate::{
-    error::AutoPayError,
+    error::SolutioError,
     state::{Payment, PaymentStatus, ThreadAuthority, TokenAuthority},
 };
 use anchor_lang::prelude::*;
@@ -85,7 +85,7 @@ pub fn handler(ctx: Context<CancelPayment>, _thread_id: u8) -> Result<()> {
     let thread_auth_bump = *ctx
         .bumps
         .get("thread_authority")
-        .ok_or(AutoPayError::MissingBump)?;
+        .ok_or(SolutioError::MissingBump)?;
 
     let ta_owner_pubkey = ctx.accounts.token_account_owner.key();
     let thread_auth_seeds = &[
