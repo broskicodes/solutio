@@ -9,46 +9,15 @@ import { Screen } from "../components/Screen";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
 import { signAndSendTransaction } from "../utils";
 import { HomeStackParamList } from "../utils/navigators";
+import { Formik } from "formik";
 
 export const PaymentScreen = ({
   route,
-  navigation,
 }: NativeStackScreenProps<HomeStackParamList, "Payment">) => {
   const { payment } = route.params;
   const provider = useSolanaProvider();
   const program = useAnchorProgram();
-  const [newAmnt, setNewAmnt] = useState(0);
   const [showUpdateModal, setShowUpadteModal] = useState(false);
-
-  const updateNewAmnt = (event: BaseSyntheticEvent) => {
-    const { value } = event.target;
-    if (Number.isNaN(Number(value))) {
-      return;
-    }
-
-    setNewAmnt(Number(value));
-  };
-
-  const updateExistingPaymnet = async () => {
-    if (!program || !provider) {
-      console.log("Missing provider");
-      return;
-    }
-
-    const ix = await updatePayment(
-      provider.wallet,
-      payment.receiver,
-      payment.mint,
-      payment.threadId,
-      program,
-      newAmnt > 0 ? new BN(newAmnt) : null,
-      null // For now
-    );
-
-    const sig = await signAndSendTransaction([ix], provider);
-    console.log(sig);
-    setShowUpadteModal(false);
-  };
 
   const cancelExistigPayment = async () => {
     if (!program || !provider) {
@@ -73,15 +42,46 @@ export const PaymentScreen = ({
       <Modal visible={showUpdateModal} animationType="fade">
         <View>
           <MaterialCommunityIcons
-            name="close"
-            size={25}
-            onPress={() => {
+              name="close"
+              size={25}
+              onPress={() => {
+                setShowUpadteModal(false);
+              }}
+            />
+          <Formik
+            initialValues={{ 
+              newAmnt: 0,
+              // schedule: ""
+            }}
+            onSubmit={async (vals) => {
+              if (!program || !provider) {
+                console.log("Missing provider");
+                return;
+              }
+          
+              const ix = await updatePayment(
+                provider.wallet,
+                payment.receiver,
+                payment.mint,
+                payment.threadId,
+                program,
+                vals.newAmnt > 0 ? new BN(vals.newAmnt) : null,
+                null // For now
+              );
+          
+              const sig = await signAndSendTransaction([ix], provider);
+              console.log(sig);
               setShowUpadteModal(false);
             }}
-          />
-          <TextInput value={newAmnt.toString()} onChange={updateNewAmnt} />
-          {/* <TextInput value={} onChange={} Uncomment with release of recurring payments*/}
-          <Button onPress={updateExistingPaymnet} title={"Confirm"} />
+          >
+            {(props) => (
+              <View>
+                <TextInput value={props.values.newAmnt === 0 ? "" : props.values.newAmnt.toString()} onChangeText={props.handleChange('newAmnt')} placeholder="New Amount to Transfer" />
+                {/* <TextInput value={} onChange={} Uncomment with release of recurring payments*/}
+                <Button onPress={props.handleSubmit} title={"Confirm"} />
+              </View>
+            )}
+          </Formik>
         </View>
       </Modal>
       <Text>Mint: {payment.mint.toBase58()}</Text>
