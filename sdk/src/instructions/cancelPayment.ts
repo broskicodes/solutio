@@ -25,14 +25,6 @@ export const cancelPayment = async (
   const [thread] = getThreadPDA(threadAuth, threadId);
   const [payment] = getPaymentPDA(taOwner.publicKey, thread);
 
-  console.log("taa", await program.provider.connection.getAccountInfo(taAuth));
-  console.log(
-    "ta",
-    await program.provider.connection.getAccountInfo(threadAuth)
-  );
-  console.log("t", await program.provider.connection.getAccountInfo(thread));
-  console.log("p", await program.provider.connection.getAccountInfo(payment));
-
   const ix = await program.methods
     .cancelPayment(threadId)
     .accounts({

@@ -2860,7 +2860,7 @@
     rpc-websockets "^7.5.1"
     superstruct "^0.14.2"
 
-"@solutio/sdk@0.1.0":
+"@solutio/sdk@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@solutio/sdk/-/sdk-0.1.1.tgz#9aa58b7a38426435f6a2b5e324961571be7427a0"
   integrity sha512-8iJHPO2N3dMYJtO0DP8/7WOVhKxZEZIm6t/BFXRZ1D/GKEQ1hiTIW/FdXC/rG381wvLky1vKLk4ZrUm9qkS1rg==

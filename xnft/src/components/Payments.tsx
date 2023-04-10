@@ -81,9 +81,6 @@ export const Payments = ({ navigate }: PaymentsProps) => {
               <Text>Receiver: {item.receiver.toBase58()}</Text>
               <Text>Amount: {item.amount.toNumber()}</Text>
               <Text>
-                {item.schedule.now ? "Now" : item.schedule.cron?.scheduleStr}
-              </Text>
-              <Text>
                 Status:{" "}
                 {item.status.active
                   ? "Active"
