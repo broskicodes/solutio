@@ -1,21 +1,14 @@
-import { cancelPayment } from "@soltility/autopay-sdk";
+import { cancelPayment, PaymentType } from "@solutio/sdk";
 import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Button,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { View, Text, Button, TouchableOpacity, FlatList } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
-import { PaymentType } from "@soltility/autopay-sdk";
 import { signAndSendTransaction } from "../utils";
-import { HomeScreenProps, HomeStackParamList } from "../utils/navigators";
+import { HomeStackParamList } from "../utils/navigators";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 interface PaymentsProps {
-  navigate: NativeStackNavigationProp<HomeStackParamList, 'Home'>['navigate'],
-  goBack: NativeStackNavigationProp<HomeStackParamList, 'Home'>['goBack']
+  navigate: NativeStackNavigationProp<HomeStackParamList, "Home">["navigate"];
+  goBack: NativeStackNavigationProp<HomeStackParamList, "Home">["goBack"];
 }
 
 export const Payments = ({ navigate }: PaymentsProps) => {
@@ -80,7 +73,7 @@ export const Payments = ({ navigate }: PaymentsProps) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              navigate('Payment', { payment: item })
+              navigate("Payment", { payment: item });
             }}
           >
             <View>

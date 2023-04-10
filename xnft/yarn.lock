@@ -2860,10 +2860,10 @@
     rpc-websockets "^7.5.1"
     superstruct "^0.14.2"
 
-"@soltility/autopay-sdk@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@soltility/autopay-sdk/-/autopay-sdk-0.1.0.tgz#9d29eeae02b5b1ec09eeace7000e37ed6cf51bf8"
-  integrity sha512-2096vmZ5zg3T5tuEgCkP2bu0mAPIj6FzGVskMHliQQPB0fHKit9BJt5F7/SiyaUJ8ON+Vx4DIZfgBsK+Ay4+4g==
+"@solutio/sdk@0.1.0":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@solutio/sdk/-/sdk-0.1.1.tgz#9aa58b7a38426435f6a2b5e324961571be7427a0"
+  integrity sha512-8iJHPO2N3dMYJtO0DP8/7WOVhKxZEZIm6t/BFXRZ1D/GKEQ1hiTIW/FdXC/rG381wvLky1vKLk4ZrUm9qkS1rg==
   dependencies:
     "@coral-xyz/anchor" "^0.27.0"
     "@solana/spl-token" "^0.3.7"

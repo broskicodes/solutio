@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import {
-  AUTOPAY_PROGRAM_ID,
+  SOLUTIO_PROGRAM_ID,
   CLOCKWORK_THREAD_PROGRAM_ID,
   THREAD_SEED,
   THREAD_AUTHORITY_SEED,
@@ -32,20 +32,20 @@ export const getTokenAuthPDA = (
       tokenAccount.toBuffer(),
       receiverTokenAccount.toBuffer(),
     ],
-    AUTOPAY_PROGRAM_ID
+    SOLUTIO_PROGRAM_ID
   );
 };
 
 export const getThreadAuthorityPDA = (taOwner: PublicKey) => {
   return PublicKey.findProgramAddressSync(
     [THREAD_AUTHORITY_SEED, taOwner.toBuffer()],
-    AUTOPAY_PROGRAM_ID
+    SOLUTIO_PROGRAM_ID
   );
 };
 
 export const getPaymentPDA = (taOwner: PublicKey, threadKey: PublicKey) => {
   return PublicKey.findProgramAddressSync(
     [PAYMENT_SEED, taOwner.toBuffer(), threadKey.toBuffer()],
-    AUTOPAY_PROGRAM_ID
+    SOLUTIO_PROGRAM_ID
   );
 };

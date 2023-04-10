@@ -22,12 +22,12 @@ export const updatePayment = async (
 ) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
   const receiverTa = await getAssociatedTokenAddress(mint, receiver);
-  
+
   if (newAmount) {
     const mintData = await getMint(program.provider.connection, mint);
     newAmount = newAmount.muln(mintData.decimals);
   }
-  
+
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
   const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
   const [thread] = getThreadPDA(threadAuth, threadId);

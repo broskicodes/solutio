@@ -7,14 +7,13 @@ import { NewPayment } from "../components/NewPayment";
 import { HomeScreenProps } from "../utils/navigators";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-
 export function SetupScreen({ navigation }: HomeScreenProps) {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <Screen>
-      <Modal visible={showModal} animationType={'fade'}>
-        <MaterialCommunityIcons 
+      <Modal visible={showModal} animationType={"fade"}>
+        <MaterialCommunityIcons
           name="close"
           size={25}
           onPress={() => {
@@ -24,7 +23,7 @@ export function SetupScreen({ navigation }: HomeScreenProps) {
         <NewPayment setShowModal={setShowModal} />
       </Modal>
       <Section title="Scheduled Payments">
-        <Payments navigate={navigation.navigate} goBack={navigation.goBack}  />
+        <Payments navigate={navigation.navigate} goBack={navigation.goBack} />
       </Section>
       <Button
         onPress={() => {

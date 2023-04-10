@@ -1,18 +1,18 @@
 import { Program, BN, AnchorProvider, Idl } from "@coral-xyz/anchor";
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import autopayIdl from "../../../target/idl/autopay.json";
+import solutioIdl from "@solutio/sdk/SolutioIDL.json";
 import {
   getThreadPDA,
   airdrop,
   getTokenAuthPDA,
-  AUTOPAY_PROGRAM_ID,
+  SOLUTIO_PROGRAM_ID,
   getThreadAuthorityPDA,
   sleep,
   setupPayment,
   updatePayment,
   cancelPayment,
   delegateTransferAuthority,
-} from "@autopay/sdk";
+} from "@solutio/sdk";
 import { assert } from "chai";
 import {
   createAssociatedTokenAccount,
@@ -25,8 +25,8 @@ import { sendTx } from "../utils";
 
 describe("e2e thread tests", () => {
   const program = new Program(
-    autopayIdl as Idl,
-    AUTOPAY_PROGRAM_ID,
+    solutioIdl as Idl,
+    SOLUTIO_PROGRAM_ID,
     AnchorProvider.env()
   );
 

@@ -5,7 +5,7 @@ use anchor_spl::{
 };
 use spl_token::instruction::transfer;
 
-use crate::{error::AutoPayError, state::TokenAuthority};
+use crate::{error::SolutioError, state::TokenAuthority};
 
 #[derive(Accounts)]
 pub struct TransferTokens<'info> {
@@ -46,7 +46,7 @@ pub fn handler(ctx: Context<TransferTokens>, amount: u64) -> Result<()> {
     let tok_auth_bump = *ctx
         .bumps
         .get("token_account_authority")
-        .ok_or(AutoPayError::MissingBump)?;
+        .ok_or(SolutioError::MissingBump)?;
 
     invoke_signed(
         &transfer(
