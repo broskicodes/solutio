@@ -1,10 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import {
-  cancelPayment,
-  PaymentType,
-  updatePayment,
-} from "@soltility/autopay-sdk";
+import { cancelPayment, PaymentType, updatePayment } from "@solutio/sdk";
 import { BN } from "bn.js";
 import { BaseSyntheticEvent, useState } from "react";
 import { Button, Modal } from "react-native";
@@ -14,7 +10,10 @@ import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
 import { signAndSendTransaction } from "../utils";
 import { HomeStackParamList } from "../utils/navigators";
 
-export const PaymentScreen = ({ route, navigation }: NativeStackScreenProps<HomeStackParamList, 'Payment'>) => {
+export const PaymentScreen = ({
+  route,
+  navigation,
+}: NativeStackScreenProps<HomeStackParamList, "Payment">) => {
   const { payment } = route.params;
   const provider = useSolanaProvider();
   const program = useAnchorProgram();
@@ -47,7 +46,7 @@ export const PaymentScreen = ({ route, navigation }: NativeStackScreenProps<Home
     );
 
     const sig = await signAndSendTransaction([ix], provider);
-    console.log(sig)
+    console.log(sig);
     setShowUpadteModal(false);
   };
 
@@ -66,20 +65,20 @@ export const PaymentScreen = ({ route, navigation }: NativeStackScreenProps<Home
     );
 
     const sig = await signAndSendTransaction([ix], provider);
-    console.log(sig)
+    console.log(sig);
   };
 
   return (
     <Screen>
       <Modal visible={showUpdateModal} animationType="fade">
         <View>
-        <MaterialCommunityIcons
-          name="close"
-          size={25}
-          onPress={() => {
-            setShowUpadteModal(false);
-          }}
-        />
+          <MaterialCommunityIcons
+            name="close"
+            size={25}
+            onPress={() => {
+              setShowUpadteModal(false);
+            }}
+          />
           <TextInput value={newAmnt.toString()} onChange={updateNewAmnt} />
           {/* <TextInput value={} onChange={} Uncomment with release of recurring payments*/}
           <Button onPress={updateExistingPaymnet} title={"Confirm"} />
@@ -99,9 +98,12 @@ export const PaymentScreen = ({ route, navigation }: NativeStackScreenProps<Home
           ? "Cancelled"
           : "Complete"}
       </Text>
-      <Button onPress={() => {
-        setShowUpadteModal(true);
-      }} title={"Update"} />
+      <Button
+        onPress={() => {
+          setShowUpadteModal(true);
+        }}
+        title={"Update"}
+      />
       <Button onPress={cancelExistigPayment} title={"cancel"} />
     </Screen>
   );

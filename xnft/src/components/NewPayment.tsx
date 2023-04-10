@@ -6,8 +6,7 @@ import {
   getThreadAuthorityPDA,
   getTokenAuthPDA,
   setupPayment,
-  sleep,
-} from "@soltility/autopay-sdk";
+} from "@solutio/sdk";
 import { BaseSyntheticEvent, useState } from "react";
 import { Button, TextInput, View } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
@@ -15,7 +14,7 @@ import { signAndSendTransaction } from "../utils";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 interface NewPaymentProps {
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const NewPayment = ({ setShowModal }: NewPaymentProps) => {

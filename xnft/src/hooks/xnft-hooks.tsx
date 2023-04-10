@@ -1,7 +1,7 @@
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { Event, XnftMetadata } from "@coral-xyz/common-public";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { getAutopayProgram } from "@soltility/autopay-sdk";
+import { getAutopayProgram } from "@solutio/sdk";
 import { useEffect, useState } from "react";
 import { XnftWallet } from "../types";
 

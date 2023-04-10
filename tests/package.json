@@ -5,7 +5,7 @@
     "dependencies": {
         "@coral-xyz/anchor": "^0.27.0",
         "@solana/web3.js": "^1.74.0",
-        "@soltility/autopay-sdk": "0.1.0"
+        "@solutio/sdk": "0.1.1"
     },
     "devDependencies": {
         "@types/chai": "^4.3.0",

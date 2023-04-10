@@ -1,19 +1,25 @@
-import { NotificationsScreen, SetupScreen, PaymentScreen } from "../screens/"
+import { NotificationsScreen, SetupScreen, PaymentScreen } from "../screens/";
 // import { TokenListNavigator } from "./screens/ManageScreen";
-import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
-import { PaymentType } from "@soltility/autopay-sdk";
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import { PaymentType } from "@solutio/sdk";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const HomeTab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 
-export type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, 'Home'>
+export type HomeScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "Home"
+>;
 
 export type HomeStackParamList = {
   Home: undefined;
   Payment: { payment: PaymentType };
-}
+};
 
 export const HomeStackNavigator = () => {
   return (
@@ -21,9 +27,8 @@ export const HomeStackNavigator = () => {
       <HomeStack.Screen name="Home" component={SetupScreen} />
       <HomeStack.Screen name="Payment" component={PaymentScreen} />
     </HomeStack.Navigator>
-  )
-}
-
+  );
+};
 
 export const TabNavigator = () => {
   return (
@@ -67,4 +72,4 @@ export const TabNavigator = () => {
       />
     </HomeTab.Navigator>
   );
-}
+};
