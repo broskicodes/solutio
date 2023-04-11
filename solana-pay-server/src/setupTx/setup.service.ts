@@ -12,12 +12,13 @@ import {
   setupPaymentIx,
 } from "@solutio/sdk";
 import {
+  ICON_URI,
   SolutioRequestParams,
   SpGetReturnType,
   SpPostReturnType,
 } from "../utils/types";
 
-const ICON_URI: string = "";
+const LABEL: string = "Creating New Payment";
 
 export interface SetupRequestParams extends SolutioRequestParams {
   amount: number;
@@ -38,7 +39,7 @@ export class SetupService {
   handleGet(): SpGetReturnType {
     return {
       icon: ICON_URI,
-      label: "",
+      label: LABEL,
     };
   }
 

@@ -1,3 +1,5 @@
+export const ICON_URI = "";
+
 export type B64TransactionString = string;
 
 export interface SpGetReturnType {

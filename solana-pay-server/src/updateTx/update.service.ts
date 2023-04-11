@@ -7,12 +7,13 @@ import {
   updatePaymentIx,
 } from "@solutio/sdk";
 import {
+  ICON_URI,
   SolutioRequestParams,
   SpGetReturnType,
   SpPostReturnType,
 } from "../utils/types";
 
-const ICON_URI: string = "";
+const LABEL: string = "Updating Payment";
 
 export interface UpdateRequestParams extends SolutioRequestParams {
   threadId: number;
@@ -33,7 +34,7 @@ export class UpdateService {
   handleGet(): SpGetReturnType {
     return {
       icon: ICON_URI,
-      label: "",
+      label: LABEL,
     };
   }
 

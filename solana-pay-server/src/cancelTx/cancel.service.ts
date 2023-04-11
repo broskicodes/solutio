@@ -7,12 +7,13 @@ import {
   serializeTransactionToBase64,
 } from "@solutio/sdk";
 import {
+  ICON_URI,
   SolutioRequestParams,
   SpGetReturnType,
   SpPostReturnType,
 } from "../utils/types";
 
-const ICON_URI: string = "";
+const LABEL: string = "Cancelling Payment";
 
 export interface CancelRequestParams extends SolutioRequestParams {
   threadId: number;
@@ -31,7 +32,7 @@ export class CancelService {
   handleGet(): SpGetReturnType {
     return {
       icon: ICON_URI,
-      label: "",
+      label: LABEL,
     };
   }
 
