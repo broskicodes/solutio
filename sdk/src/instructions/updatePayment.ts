@@ -25,7 +25,7 @@ export const updatePayment = async (
 
   if (newAmount) {
     const mintData = await getMint(program.provider.connection, mint);
-    newAmount = newAmount.muln(mintData.decimals);
+    newAmount = newAmount.muln(Math.pow(10, mintData.decimals));
   }
 
   const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);

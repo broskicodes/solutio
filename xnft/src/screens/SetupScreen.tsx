@@ -1,4 +1,4 @@
-import { Button, Modal } from "react-native";
+import { Button, Modal, View } from "react-native";
 import { Screen } from "../components/Screen";
 import { Section } from "../components/Section";
 import { Payments } from "../components/Payments";
@@ -13,13 +13,15 @@ export function SetupScreen({ navigation }: HomeScreenProps) {
   return (
     <Screen>
       <Modal visible={showModal} animationType={"fade"}>
-        <MaterialCommunityIcons
-          name="close"
-          size={25}
-          onPress={() => {
-            setShowModal(false);
-          }}
-        />
+        <View className="mt-4 ml-4">
+          <MaterialCommunityIcons
+            name="close"
+            size={25}
+            onPress={() => {
+              setShowModal(false);
+            }}
+          />
+        </View>
         <NewPayment setShowModal={setShowModal} />
       </Modal>
       <Section title="Scheduled Payments">
