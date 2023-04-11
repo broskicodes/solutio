@@ -1,5 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { UpdateRequestParams, UpdateService } from "./update.service";
 import { SpGetReturnType, SpPostReturnType } from "../utils/types";
 

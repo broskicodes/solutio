@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { cancelPayment, PaymentType, updatePayment } from "@solutio/sdk";
+import { cancelPaymentIx, updatePaymentIx } from "@solutio/sdk";
 import { BN } from "bn.js";
 import { useState } from "react";
 import { Button, Modal } from "react-native";
@@ -19,19 +19,40 @@ export const PaymentScreen = ({
   const program = useAnchorProgram();
   const [showUpdateModal, setShowUpadteModal] = useState(false);
 
+  const updateExistingPayment = async (newAmnt: number) => {
+    if (!program || !provider) {
+      console.log("Missing provider");
+      return;
+    }
+
+    const ix = await updatePaymentIx({
+      taOwner: provider.wallet.publicKey,
+      receiver: payment.receiver,
+      mint: payment.mint,
+      threadId: payment.threadId,
+      program,
+      newAmount: newAmnt > 0 ? new BN(newAmnt) : null,
+      newSchedule: null // For now
+    });
+
+    const sig = await signAndSendTransaction([ix], provider);
+    console.log(sig);
+    setShowUpadteModal(false);
+  };
+
   const cancelExistigPayment = async () => {
     if (!program || !provider) {
       console.log("Missing provider");
       return;
     }
 
-    const ix = await cancelPayment(
-      provider.wallet,
-      payment.receiver,
-      payment.mint,
-      payment.threadId,
+    const ix = await cancelPaymentIx({
+      taOwner: provider.wallet.publicKey,
+      receiver: payment.receiver,
+      mint: payment.mint,
+      threadId: payment.threadId,
       program
-    );
+  });
 
     const sig = await signAndSendTransaction([ix], provider);
     console.log(sig);
@@ -57,24 +78,7 @@ export const PaymentScreen = ({
                 // schedule: ""
               }}
               onSubmit={async (vals) => {
-                if (!program || !provider) {
-                  console.log("Missing provider");
-                  return;
-                }
-
-                const ix = await updatePayment(
-                  provider.wallet,
-                  payment.receiver,
-                  payment.mint,
-                  payment.threadId,
-                  program,
-                  vals.newAmnt > 0 ? new BN(vals.newAmnt) : null,
-                  null // For now
-                );
-
-                const sig = await signAndSendTransaction([ix], provider);
-                console.log(sig);
-                setShowUpadteModal(false);
+                await updateExistingPayment(vals.newAmnt);
               }}
             >
               {(props) => (
