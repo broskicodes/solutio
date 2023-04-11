@@ -11,6 +11,7 @@
     "./dist",
     "./src"
   ],
+  "private": false,
   "scripts": {
     "build": "npx tsc",
     "fmt": "prettier --write ./src"

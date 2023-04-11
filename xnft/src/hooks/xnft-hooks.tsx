@@ -1,7 +1,7 @@
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { Event, XnftMetadata } from "@coral-xyz/common-public";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { getAutopayProgram } from "@solutio/sdk";
+import { getSolutioProgram } from "@solutio/sdk";
 import { useEffect, useState } from "react";
 import { XnftWallet } from "../types";
 
@@ -184,7 +184,7 @@ export function useAnchorProgram(): Program | undefined {
 
   useEffect(() => {
     if (provider) {
-      setProgram(getAutopayProgram(provider));
+      setProgram(getSolutioProgram(provider));
     }
   }, [provider, setProgram]);
 

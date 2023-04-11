@@ -1,33 +1,9 @@
 import { BN, Idl, Program, Provider } from "@coral-xyz/anchor";
 import { ComputeBudgetProgram, PublicKey, Connection } from "@solana/web3.js";
-import solutioIdl from "../SolutioIDL.json";
+import solutioIdl from "../../SolutioIDL.json";
 import { SOLUTIO_PROGRAM_ID, NEXT_THREAD_ID_INDEX } from "./constants";
 
-export interface ThreadTrigger {
-  now?: {};
-  cron?: { scheduleStr: String };
-}
-
-export interface PaymentStatus {
-  active?: {};
-  cancelled?: {};
-  complete?: {};
-}
-
-export interface PaymentType {
-  threadAuthority: PublicKey;
-  tokenAuthority: PublicKey;
-  threadKey: PublicKey;
-  threadId: number;
-  payer: PublicKey;
-  receiver: PublicKey;
-  mint: PublicKey;
-  status: PaymentStatus;
-  amount: BN;
-  schedule: ThreadTrigger;
-}
-
-export const getAutopayProgram = (provider: Provider): Program => {
+export const getSolutioProgram = (provider: Provider): Program => {
   return new Program(solutioIdl as Idl, SOLUTIO_PROGRAM_ID, provider);
 };
 

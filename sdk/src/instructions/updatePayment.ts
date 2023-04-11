@@ -1,26 +1,23 @@
-import { Program, BN } from "@coral-xyz/anchor";
-import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
-import { ThreadTrigger } from "../helpers";
+import { UpdatePaymentParams } from "src/utils";
+import { CLOCKWORK_THREAD_PROGRAM_ID } from "../utils/constants";
 import {
   getPaymentPDA,
   getThreadAuthorityPDA,
   getThreadPDA,
   getTokenAuthPDA,
-} from "../pdas";
+} from "../utils/pdas";
 
-export const updatePayment = async (
-  taOwner: Keypair | Wallet,
-  receiver: PublicKey,
-  mint: PublicKey,
-  threadId: number,
-  program: Program,
-  newAmount: BN | null,
-  newSchedlue: ThreadTrigger | null
-) => {
-  const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
+export const updatePaymentIx = async ({
+  taOwner,
+  receiver,
+  mint,
+  threadId,
+  program,
+  newAmount,
+  newSchedlue,
+}: UpdatePaymentParams) => {
+  const ta = await getAssociatedTokenAddress(mint, taOwner);
   const receiverTa = await getAssociatedTokenAddress(mint, receiver);
 
   if (newAmount) {
@@ -28,10 +25,10 @@ export const updatePayment = async (
     newAmount = newAmount.muln(Math.pow(10, mintData.decimals));
   }
 
-  const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
-  const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
+  const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
+  const [threadAuth] = getThreadAuthorityPDA(taOwner);
   const [thread] = getThreadPDA(threadAuth, threadId);
-  const [payment] = getPaymentPDA(taOwner.publicKey, thread);
+  const [payment] = getPaymentPDA(taOwner, thread);
 
   const optAcnts = newAmount
     ? {
@@ -54,7 +51,7 @@ export const updatePayment = async (
     .accounts({
       threadAuthority: threadAuth,
       payment,
-      tokenAccountOwner: taOwner.publicKey,
+      tokenAccountOwner: taOwner,
       thread,
       threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
       ...optAcnts,
