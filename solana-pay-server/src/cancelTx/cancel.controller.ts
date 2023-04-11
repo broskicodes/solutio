@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
-import { CancelService } from "./cancel.service";
+import { CancelRequestParams, CancelService } from "./cancel.service";
 import { SpGetReturnType, SpPostReturnType } from "../utils/types";
 
 @Controller("cancel")
@@ -8,16 +8,12 @@ export class CancelController {
   constructor(private readonly appService: CancelService) {}
 
   @Get()
-  async get(
-    @Req() req: Request,
-    @Res() res: Response
-  ): Promise<SpGetReturnType> {
+  async get(): Promise<SpGetReturnType> {
     return this.appService.handleGet();
   }
 
   @Post()
-  async post(
-    @Req() req: Request,
-    @Res() res: Response
-  ): Promise<SpPostReturnType> {}
+  async post(@Body() body: CancelRequestParams): Promise<SpPostReturnType> {
+    return await this.appService.handlePost(body);
+  }
 }

@@ -9,3 +9,9 @@ export interface SpPostReturnType {
   transaction: B64TransactionString;
   messgae?: string;
 }
+
+export interface SolutioRequestParams {
+  taOwner: string;
+  receiver: string;
+  mint: string;
+}

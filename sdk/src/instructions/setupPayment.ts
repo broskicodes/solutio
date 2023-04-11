@@ -12,7 +12,7 @@ export const setupPaymentIx = async ({
   taOwner,
   receiver,
   mint,
-  amount,
+  transferAmount,
   threadId,
   threadTrigger,
   program,
@@ -27,7 +27,10 @@ export const setupPaymentIx = async ({
   const [payment] = getPaymentPDA(taOwner, thread);
 
   const ix = await program.methods
-    .setupNewPayment(amount.muln(Math.pow(10, mintData.decimals)), threadTrigger)
+    .setupNewPayment(
+      transferAmount.muln(Math.pow(10, mintData.decimals)),
+      threadTrigger
+    )
     .accounts({
       tokenAccountAuthority: taAuth,
       threadAuthority: threadAuth,

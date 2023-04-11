@@ -1,10 +1,25 @@
 import { AnchorProvider } from "@coral-xyz/anchor";
 import { Program, Provider } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
-import { getSolutioProgram } from "@solutio/sdk";
-import { SpGetReturnType, SpPostReturnType } from "../utils/types";
+import { PublicKey, TransactionInstruction } from "@solana/web3.js";
+import {
+  getSolutioProgram,
+  serializeTransactionToBase64,
+  updatePaymentIx,
+} from "@solutio/sdk";
+import {
+  SolutioRequestParams,
+  SpGetReturnType,
+  SpPostReturnType,
+} from "../utils/types";
 
 const ICON_URI: string = "";
+
+export interface UpdateRequestParams extends SolutioRequestParams {
+  threadId: number;
+  newAmount: number | null;
+  newSchedule: string | null;
+}
 
 @Injectable()
 export class UpdateService {
@@ -23,5 +38,37 @@ export class UpdateService {
     };
   }
 
-  async handlePost(): Promise<SpPostReturnType> {}
+  async handlePost({
+    taOwner,
+    receiver,
+    mint,
+    threadId,
+    newAmount,
+    newSchedule,
+  }: UpdateRequestParams): Promise<SpPostReturnType> {
+    const ixs: TransactionInstruction[] = [];
+
+    const taOwnerKey = new PublicKey(taOwner);
+    const receiverKey = new PublicKey(receiver);
+    const mintKey = new PublicKey(mint);
+
+    ixs.push(
+      await updatePaymentIx({
+        taOwner: taOwnerKey,
+        receiver: receiverKey,
+        mint: mintKey,
+        threadId,
+        program: this.program,
+        newAmount,
+        newSchedule: null, // process newSchedule then replace
+      })
+    );
+
+    const b64Tx = serializeTransactionToBase64(ixs);
+
+    return {
+      transaction: b64Tx,
+      messgae: "", // Say something
+    };
+  }
 }

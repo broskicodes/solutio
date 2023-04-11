@@ -34,11 +34,11 @@ export interface SolutioIxParams {
 }
 
 export interface DelegateTransferAuthority extends SolutioIxParams {
-  delAmnt: BN;
+  delegateAmount: BN;
 }
 
 export interface SetupPaymentParmas extends SolutioIxParams {
-  amount: BN;
+  transferAmount: BN;
   threadId: number;
   threadTrigger: ThreadTrigger;
 }

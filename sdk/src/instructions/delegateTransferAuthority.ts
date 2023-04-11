@@ -6,7 +6,7 @@ export const delegateTransferAuthorityIx = async ({
   taOwner,
   receiver,
   mint,
-  delAmnt,
+  delegateAmount,
   program,
 }: DelegateTransferAuthority) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner);
@@ -16,7 +16,9 @@ export const delegateTransferAuthorityIx = async ({
   const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
 
   const ix = await program.methods
-    .delegateTransferAuthority(delAmnt.muln(Math.pow(10, mintData.decimals)))
+    .delegateTransferAuthority(
+      delegateAmount.muln(Math.pow(10, mintData.decimals))
+    )
     .accounts({
       newAuthority: taAuth,
       mint,
