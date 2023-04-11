@@ -1,33 +1,15 @@
-import { BN, Idl, Program, Provider } from "@coral-xyz/anchor";
-import { ComputeBudgetProgram, PublicKey, Connection } from "@solana/web3.js";
-import solutioIdl from "../SolutioIDL.json";
+import { Idl, Program, Provider } from "@coral-xyz/anchor";
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  Connection,
+  TransactionInstruction,
+  Transaction,
+} from "@solana/web3.js";
+import solutioIdl from "../../SolutioIDL.json";
 import { SOLUTIO_PROGRAM_ID, NEXT_THREAD_ID_INDEX } from "./constants";
 
-export interface ThreadTrigger {
-  now?: {};
-  cron?: { scheduleStr: String };
-}
-
-export interface PaymentStatus {
-  active?: {};
-  cancelled?: {};
-  complete?: {};
-}
-
-export interface PaymentType {
-  threadAuthority: PublicKey;
-  tokenAuthority: PublicKey;
-  threadKey: PublicKey;
-  threadId: number;
-  payer: PublicKey;
-  receiver: PublicKey;
-  mint: PublicKey;
-  status: PaymentStatus;
-  amount: BN;
-  schedule: ThreadTrigger;
-}
-
-export const getAutopayProgram = (provider: Provider): Program => {
+export const getSolutioProgram = (provider: Provider): Program => {
   return new Program(solutioIdl as Idl, SOLUTIO_PROGRAM_ID, provider);
 };
 
@@ -70,4 +52,35 @@ export const getNextThreadId = async (
   }
 
   return info.data[NEXT_THREAD_ID_INDEX];
+};
+
+export const signAndSendTransaction = async (
+  intructions: TransactionInstruction[],
+  provider: Provider
+) => {
+  const tx = new Transaction();
+  tx.add(...intructions);
+
+  if (!provider.sendAndConfirm) {
+    console.log("Cannot send tx");
+    return;
+  }
+
+  const txSig = await provider.sendAndConfirm(tx);
+
+  return txSig;
+};
+
+export const serializeTransactionToBase64 = (
+  intructions: TransactionInstruction[]
+) => {
+  const tx = new Transaction();
+  tx.add(...intructions);
+
+  const serializedTx = tx.serialize({
+    verifySignatures: false,
+    requireAllSignatures: false,
+  });
+
+  return serializedTx.toString("base64");
 };

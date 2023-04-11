@@ -1,36 +1,36 @@
-import { Program, BN } from "@coral-xyz/anchor";
-import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { CLOCKWORK_THREAD_PROGRAM_ID } from "../constants";
-import { ThreadTrigger } from "../helpers";
 import {
   getPaymentPDA,
+  SetupPaymentParmas,
+  CLOCKWORK_THREAD_PROGRAM_ID,
   getThreadAuthorityPDA,
   getThreadPDA,
   getTokenAuthPDA,
-} from "../pdas";
+} from "../utils";
 
-export const setupPayment = async (
-  taOwner: Keypair | Wallet,
-  receiver: PublicKey,
-  mint: PublicKey,
-  amount: BN,
-  threadId: number,
-  threadTrigger: ThreadTrigger,
-  program: Program
-) => {
-  const ta = await getAssociatedTokenAddress(mint, taOwner.publicKey);
+export const setupPaymentIx = async ({
+  taOwner,
+  receiver,
+  mint,
+  transferAmount,
+  threadId,
+  threadTrigger,
+  program,
+}: SetupPaymentParmas) => {
+  const ta = await getAssociatedTokenAddress(mint, taOwner);
   const receiverTa = await getAssociatedTokenAddress(mint, receiver);
   const mintData = await getMint(program.provider.connection, mint);
 
-  const [taAuth] = getTokenAuthPDA(taOwner.publicKey, ta, receiverTa);
-  const [threadAuth] = getThreadAuthorityPDA(taOwner.publicKey);
+  const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
+  const [threadAuth] = getThreadAuthorityPDA(taOwner);
   const [thread] = getThreadPDA(threadAuth, threadId);
-  const [payment] = getPaymentPDA(taOwner.publicKey, thread);
+  const [payment] = getPaymentPDA(taOwner, thread);
 
   const ix = await program.methods
-    .setupNewPayment(amount.muln(Math.pow(10, mintData.decimals)), threadTrigger)
+    .setupNewPayment(
+      transferAmount.muln(Math.pow(10, mintData.decimals)),
+      threadTrigger
+    )
     .accounts({
       tokenAccountAuthority: taAuth,
       threadAuthority: threadAuth,
@@ -39,7 +39,7 @@ export const setupPayment = async (
       tokenAccount: ta,
       receiverTokenAccount: receiverTa,
       receiver,
-      tokenAccountOwner: taOwner.publicKey,
+      tokenAccountOwner: taOwner,
       thread,
       threadProgram: CLOCKWORK_THREAD_PROGRAM_ID,
     })

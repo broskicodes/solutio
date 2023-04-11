@@ -1,11 +1,11 @@
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import {
-  delegateTransferAuthority,
+  delegateTransferAuthorityIx,
   getNextThreadId,
   getThreadAuthorityPDA,
   getTokenAuthPDA,
-  setupPayment,
+  setupPaymentIx,
 } from "@solutio/sdk";
 import { Button, TextInput, View } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
@@ -21,6 +21,75 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
   const provider = useSolanaProvider();
   const program = useAnchorProgram();
 
+  const sendTx = async (
+    receiver: string,
+    mintAddress: string,
+    delegateAmnt: number,
+    transferAmnt: number
+  ) => {
+    if (!program || !provider) {
+      console.log("Missing provider");
+      return;
+    }
+
+    // const receiverKey = new PublicKey(receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
+    const receiverKey = new PublicKey(
+      "CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd"
+    );
+    // const mintKey = new PublicKey(mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    const mintKey = new PublicKey(
+      "JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj"
+    );
+
+    const ixs: TransactionInstruction[] = [];
+
+    const userTa = await getAssociatedTokenAddress(
+      mintKey,
+      provider.wallet.publicKey
+    );
+    const receiverTa = await getAssociatedTokenAddress(mintKey, receiverKey);
+    const [tokenAuthKey] = getTokenAuthPDA(
+      provider.wallet.publicKey,
+      userTa,
+      receiverTa
+    );
+    const tokAuthAcnt = await provider.connection.getAccountInfo(tokenAuthKey);
+
+    if (!tokAuthAcnt) {
+      ixs.push(
+        await delegateTransferAuthorityIx({
+          taOwner: provider.wallet.publicKey,
+          receiver: receiverKey,
+          mint: mintKey,
+          delegateAmount: new BN(delegateAmnt),
+          program
+      })
+      );
+    }
+
+    const [threadAuthKey] = getThreadAuthorityPDA(provider.wallet.publicKey);
+    const nextThreadId = await getNextThreadId(
+      provider.connection,
+      threadAuthKey
+    );
+
+    ixs.push(
+      await setupPaymentIx({
+        taOwner: provider.wallet.publicKey,
+        receiver: receiverKey,
+        mint: mintKey,
+        transferAmount: new BN(transferAmnt),
+        threadId: nextThreadId,
+        threadTrigger: { now: {} },
+        program
+      })
+    );
+
+    const sig = await signAndSendTransaction(ixs, provider);
+    setShowModal(false);
+    console.log(sig);
+  };
+
   return (
     <View className="flex justify-center items-center h-5/6">
       <View className="w-3/4">
@@ -32,74 +101,12 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
             transferAmnt: 0,
           }}
           onSubmit={async (vals) => {
-            if (!program || !provider) {
-              console.log("Missing provider");
-              return;
-            }
-
-            // const receiverKey = new PublicKey(vals.receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
-            const receiverKey = new PublicKey(
-              "CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd"
+            await sendTx(
+              vals.receiver,
+              vals.mintAddress,
+              vals.delegateAmnt,
+              vals.transferAmnt
             );
-            // const mintKey = new PublicKey(vals.mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-            const mintKey = new PublicKey(
-              "JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj"
-            );
-
-            const ixs: TransactionInstruction[] = [];
-
-            const userTa = await getAssociatedTokenAddress(
-              mintKey,
-              provider.wallet.publicKey
-            );
-            const receiverTa = await getAssociatedTokenAddress(
-              mintKey,
-              receiverKey
-            );
-            const [tokenAuthKey] = getTokenAuthPDA(
-              provider.wallet.publicKey,
-              userTa,
-              receiverTa
-            );
-            const tokAuthAcnt = await provider.connection.getAccountInfo(
-              tokenAuthKey
-            );
-
-            if (!tokAuthAcnt) {
-              ixs.push(
-                await delegateTransferAuthority(
-                  provider.wallet,
-                  receiverKey,
-                  mintKey,
-                  new BN(vals.delegateAmnt),
-                  program
-                )
-              );
-            }
-
-            const [threadAuthKey] = getThreadAuthorityPDA(
-              provider.wallet.publicKey
-            );
-            const nextThreadId = await getNextThreadId(
-              provider.connection,
-              threadAuthKey
-            );
-
-            ixs.push(
-              await setupPayment(
-                provider.wallet,
-                receiverKey,
-                mintKey,
-                new BN(vals.transferAmnt),
-                nextThreadId,
-                { now: {} },
-                program
-              )
-            );
-
-            const sig = await signAndSendTransaction(ixs, provider);
-            setShowModal(false);
-            console.log(sig);
           }}
         >
           {(props) => (

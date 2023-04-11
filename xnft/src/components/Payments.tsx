@@ -1,4 +1,4 @@
-import { cancelPayment, PaymentType } from "@solutio/sdk";
+import { cancelPaymentIx, PaymentType } from "@solutio/sdk";
 import { useEffect, useState } from "react";
 import { View, Text, Button, TouchableOpacity, FlatList } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
@@ -48,13 +48,13 @@ export const Payments = ({ navigate }: PaymentsProps) => {
       return;
     }
 
-    const ix = await cancelPayment(
-      provider.wallet,
-      payment.receiver,
-      payment.mint,
-      payment.threadId,
+    const ix = await cancelPaymentIx({
+      taOwner: provider.wallet.publicKey,
+      receiver: payment.receiver,
+      mint: payment.mint,
+      threadId: payment.threadId,
       program
-    );
+  });
 
     await signAndSendTransaction([ix], provider);
   };
