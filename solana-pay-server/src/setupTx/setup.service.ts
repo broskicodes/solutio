@@ -1,5 +1,4 @@
-import { AnchorProvider } from "@coral-xyz/anchor";
-import { Program, Provider } from "@coral-xyz/anchor";
+import { Program, Provider, AnchorProvider, BN } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
@@ -12,7 +11,6 @@ import {
   serializeTransactionToBase64,
   setupPaymentIx,
 } from "@solutio/sdk";
-import { BN } from "bn.js";
 import {
   SolutioRequestParams,
   SpGetReturnType,

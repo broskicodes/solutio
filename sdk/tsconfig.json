@@ -10,7 +10,6 @@
     "strict": true,
     "declaration": true,
     "outDir": "./dist",
-    "baseUrl": "./"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modues"]

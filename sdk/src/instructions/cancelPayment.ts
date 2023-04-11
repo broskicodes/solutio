@@ -1,12 +1,12 @@
 import { getAssociatedTokenAddress } from "@solana/spl-token";
-import { CancelPaymentParams } from "src/utils";
-import { CLOCKWORK_THREAD_PROGRAM_ID } from "../utils/constants";
 import {
   getPaymentPDA,
+  CancelPaymentParams,
+  CLOCKWORK_THREAD_PROGRAM_ID,
   getThreadAuthorityPDA,
   getThreadPDA,
   getTokenAuthPDA,
-} from "../utils/pdas";
+} from "../utils";
 
 export const cancelPaymentIx = async ({
   taOwner,

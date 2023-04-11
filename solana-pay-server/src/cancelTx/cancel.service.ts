@@ -1,5 +1,4 @@
-import { AnchorProvider } from "@coral-xyz/anchor";
-import { Program, Provider } from "@coral-xyz/anchor";
+import { Program, Provider, AnchorProvider } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import {

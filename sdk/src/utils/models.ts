@@ -1,6 +1,5 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import BN from "bn.js";
 
 export interface ThreadTrigger {
   now?: {};
@@ -46,7 +45,7 @@ export interface SetupPaymentParmas extends SolutioIxParams {
 export interface UpdatePaymentParams extends SolutioIxParams {
   threadId: number;
   newAmount: BN | null;
-  newSchedlue: ThreadTrigger | null;
+  newSchedule: ThreadTrigger | null;
 }
 
 export interface CancelPaymentParams extends SolutioIxParams {

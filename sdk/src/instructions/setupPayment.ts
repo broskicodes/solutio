@@ -1,12 +1,12 @@
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
-import { SetupPaymentParmas } from "src/utils";
-import { CLOCKWORK_THREAD_PROGRAM_ID } from "../utils/constants";
 import {
   getPaymentPDA,
+  SetupPaymentParmas,
+  CLOCKWORK_THREAD_PROGRAM_ID,
   getThreadAuthorityPDA,
   getThreadPDA,
   getTokenAuthPDA,
-} from "../utils/pdas";
+} from "../utils";
 
 export const setupPaymentIx = async ({
   taOwner,

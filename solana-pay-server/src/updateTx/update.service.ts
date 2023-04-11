@@ -1,5 +1,4 @@
-import { AnchorProvider } from "@coral-xyz/anchor";
-import { Program, Provider } from "@coral-xyz/anchor";
+import { Program, Provider, AnchorProvider, BN } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import {
@@ -59,7 +58,7 @@ export class UpdateService {
         mint: mintKey,
         threadId,
         program: this.program,
-        newAmount,
+        newAmount: newAmount ? new BN(newAmount) : null,
         newSchedule: null, // process newSchedule then replace
       })
     );

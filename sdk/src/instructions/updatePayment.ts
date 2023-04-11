@@ -1,12 +1,12 @@
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
-import { UpdatePaymentParams } from "src/utils";
-import { CLOCKWORK_THREAD_PROGRAM_ID } from "../utils/constants";
 import {
+  UpdatePaymentParams,
+  CLOCKWORK_THREAD_PROGRAM_ID,
   getPaymentPDA,
   getThreadAuthorityPDA,
   getThreadPDA,
   getTokenAuthPDA,
-} from "../utils/pdas";
+} from "../utils";
 
 export const updatePaymentIx = async ({
   taOwner,
@@ -15,7 +15,7 @@ export const updatePaymentIx = async ({
   threadId,
   program,
   newAmount,
-  newSchedlue,
+  newSchedule,
 }: UpdatePaymentParams) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner);
   const receiverTa = await getAssociatedTokenAddress(mint, receiver);
@@ -47,7 +47,7 @@ export const updatePaymentIx = async ({
       };
 
   const ix = await program.methods
-    .updatePayment(threadId, newSchedlue, newAmount)
+    .updatePayment(threadId, newSchedule, newAmount)
     .accounts({
       threadAuthority: threadAuth,
       payment,

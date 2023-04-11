@@ -1,6 +1,5 @@
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
-import { DelegateTransferAuthority } from "src/utils";
-import { getTokenAuthPDA } from "../utils/pdas";
+import { DelegateTransferAuthority, getTokenAuthPDA } from "../utils";
 
 export const delegateTransferAuthorityIx = async ({
   taOwner,
