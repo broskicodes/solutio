@@ -19,10 +19,6 @@ export interface CancelRequestParams extends SolutioRequestParams {
   threadId: number;
 }
 
-export interface CancelRequestParams extends SolutioRequestParams {
-  threadId: number;
-}
-
 @Injectable()
 export class CancelService {
   private provider: Provider;

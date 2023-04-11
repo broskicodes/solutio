@@ -26,12 +26,6 @@ export interface SetupRequestParams extends SolutioRequestParams {
   delegateAmount?: number;
 }
 
-export interface SetupRequestParams extends SolutioRequestParams {
-  amount: number;
-  threadSchedule: string;
-  delegateAmount?: number;
-}
-
 @Injectable()
 export class SetupService {
   private provider: Provider;
