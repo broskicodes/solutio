@@ -21,6 +21,12 @@ export interface UpdateRequestParams extends SolutioRequestParams {
   newSchedule: string | null;
 }
 
+export interface UpdateRequestParams extends SolutioRequestParams {
+  threadId: number;
+  newAmount: number | null;
+  newSchedule: string | null;
+}
+
 @Injectable()
 export class UpdateService {
   private provider: Provider;
