@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useFonts, Inter_900Black } from "@expo-google-fonts/dev";
 import { TabNavigator } from "./utils/navigators";
 import "./styles";
+import { Wallet } from "./components/Wallet";
 
 function App() {
   let [fontsLoaded] = useFonts({
@@ -22,7 +23,9 @@ function App() {
   return (
     <RecoilRoot>
       <NavigationContainer>
-        <TabNavigator />
+        <Wallet>
+          <TabNavigator />
+        </Wallet>
       </NavigationContainer>
     </RecoilRoot>
   );

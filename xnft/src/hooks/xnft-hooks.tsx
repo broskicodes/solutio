@@ -4,6 +4,10 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { getSolutioProgram } from "@solutio/sdk";
 import { useEffect, useState } from "react";
 import { XnftWallet } from "../types";
+import {
+  useAnchorWallet,
+  useConnection as useAdapterConnection,
+} from "@solana/wallet-adapter-react";
 
 declare global {
   interface Window {
@@ -159,27 +163,38 @@ export function useDimensions(debounceMs = 0) {
   return dimensions;
 }
 
-export function useSolanaProvider(): AnchorProvider | undefined {
-  const connection = useSolanaConnection();
+interface ProviderContextState {
+  provider: AnchorProvider | undefined;
+  isXnft: boolean;
+}
+
+export function useSolanaProvider(): ProviderContextState {
+  const xNftConnection = useSolanaConnection();
+  const adapterConnection = useAdapterConnection();
+  const adapterWallet = useAnchorWallet();
   const [provider, setProvider] = useState<AnchorProvider>();
 
   useEffect(() => {
-    if (connection) {
+    console.log("Poop");
+    const connection = xNftConnection
+      ? xNftConnection
+      : adapterConnection.connection;
+    const wallet = xNftConnection
+      ? new XnftWallet(window.xnft.solana)
+      : adapterWallet;
+
+    if (wallet) {
       setProvider(
-        new AnchorProvider(
-          connection,
-          new XnftWallet(window.xnft.solana),
-          AnchorProvider.defaultOptions()
-        )
+        new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
       );
     }
-  }, [connection, setProvider]);
+  }, [xNftConnection, adapterConnection, adapterWallet, setProvider]);
 
-  return provider;
+  return { provider, isXnft: !!xNftConnection };
 }
 
 export function useAnchorProgram(): Program | undefined {
-  const provider = useSolanaProvider();
+  const { provider } = useSolanaProvider();
   const [program, setProgram] = useState<Program>();
 
   useEffect(() => {

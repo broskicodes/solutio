@@ -1,6 +1,7 @@
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import {
+  constructSetupLink,
   delegateTransferAuthorityIx,
   getNextThreadId,
   getThreadAuthorityPDA,
@@ -18,7 +19,7 @@ interface NewPaymentProps {
 }
 
 export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
-  const provider = useSolanaProvider();
+  const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
 
   const sendTx = async (
@@ -62,8 +63,8 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
           receiver: receiverKey,
           mint: mintKey,
           delegateAmount: new BN(delegateAmnt),
-          program
-      })
+          program,
+        })
       );
     }
 
@@ -81,13 +82,21 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
         transferAmount: new BN(transferAmnt),
         threadId: nextThreadId,
         threadTrigger: { now: {} },
-        program
+        program,
       })
     );
 
-    const sig = await signAndSendTransaction(ixs, provider);
+    await constructSetupLink({
+      taOwner: provider.publicKey.toBase58(),
+      receiver: receiverKey.toBase58(),
+      mint: mintKey.toBase58(),
+      amount: transferAmnt,
+      delegateAmount: delegateAmnt,
+      threadSchedule: "{ now: {} }",
+    });
+    // const sig = await signAndSendTransaction(ixs, provider);
     setShowModal(false);
-    console.log(sig);
+    // console.log(sig);
   };
 
   return (

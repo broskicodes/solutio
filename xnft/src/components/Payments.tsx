@@ -12,7 +12,7 @@ interface PaymentsProps {
 }
 
 export const Payments = ({ navigate }: PaymentsProps) => {
-  const provider = useSolanaProvider();
+  const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
   const [payments, setPayments] = useState<PaymentType[]>([]);
 
@@ -53,8 +53,8 @@ export const Payments = ({ navigate }: PaymentsProps) => {
       receiver: payment.receiver,
       mint: payment.mint,
       threadId: payment.threadId,
-      program
-  });
+      program,
+    });
 
     await signAndSendTransaction([ix], provider);
   };

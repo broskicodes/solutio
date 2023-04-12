@@ -15,7 +15,7 @@ export const PaymentScreen = ({
   route,
 }: NativeStackScreenProps<HomeStackParamList, "Payment">) => {
   const { payment } = route.params;
-  const provider = useSolanaProvider();
+  const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
   const [showUpdateModal, setShowUpadteModal] = useState(false);
 
@@ -32,7 +32,7 @@ export const PaymentScreen = ({
       threadId: payment.threadId,
       program,
       newAmount: newAmnt > 0 ? new BN(newAmnt) : null,
-      newSchedule: null // For now
+      newSchedule: null, // For now
     });
 
     const sig = await signAndSendTransaction([ix], provider);
@@ -51,8 +51,8 @@ export const PaymentScreen = ({
       receiver: payment.receiver,
       mint: payment.mint,
       threadId: payment.threadId,
-      program
-  });
+      program,
+    });
 
     const sig = await signAndSendTransaction([ix], provider);
     console.log(sig);

@@ -1,11 +1,20 @@
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
+import { useSolanaProvider } from "../hooks/xnft-hooks";
 
 type Props = {
   style?: StyleProp<ViewStyle>;
   children: boolean | JSX.Element | JSX.Element[] | null;
 };
 export function Screen({ style, children }: Props) {
-  return <View style={[styles.screen, style]}>{children}</View>;
+  const { isXnft } = useSolanaProvider();
+
+  return (
+  <View style={[styles.screen, style]}>
+    {!isXnft && <WalletMultiButton />}
+    {children}
+  </View>
+  );
 }
 
 const styles = StyleSheet.create({
