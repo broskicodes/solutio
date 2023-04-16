@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "name": "autopay",
+  "version": "0.1.1",
+  "name": "solutio",
   "instructions": [
     {
       "name": "setupNewPayment",
@@ -509,12 +509,7 @@
             "fields": [
               {
                 "name": "schedule_str",
-                "type": {
-                  "array": [
-                    "u8",
-                    128
-                  ]
-                }
+                "type": "string"
               }
             ]
           }
@@ -560,5 +555,8 @@
       "name": "MissingOptionalAccount",
       "msg": "Context is missing a required account"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "8sbSXaprHK3Mr9ft8QpAQqZHz4PEsaSH9dv5gAGtqcow"
+  }
 }

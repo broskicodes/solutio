@@ -1,18 +1,32 @@
-import { PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import {
-  constructSetupLink,
+  constructSetupIxQR,
+  ConvertableString,
+  convertStringToSchedule,
   delegateTransferAuthorityIx,
   getNextThreadId,
   getThreadAuthorityPDA,
   getTokenAuthPDA,
   setupPaymentIx,
 } from "@solutio/sdk";
-import { Button, TextInput, View } from "react-native";
+import { Button, Text, TextInput, View } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
-import { signAndSendTransaction } from "../utils";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import {
+  signAndSendTransaction,
+  TEST_MINT_ADDRESS,
+  TEST_MINT_AMOUNT,
+} from "../utils";
+import {
+  getAssociatedTokenAddress,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
+} from "@solana/spl-token";
 import { Formik } from "formik";
+import { useRef, useState } from "react";
+import SelectDropdown from "react-native-select-dropdown";
+import testKp from "../../test-mint-auth-keypair.json";
+import { Section } from "./Section";
 
 interface NewPaymentProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,26 +35,30 @@ interface NewPaymentProps {
 export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
   const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
+  const [scheduleStr, setScheduleStr] =
+    useState<ConvertableString>("Immediate");
+  const qrRef = useRef<HTMLDivElement>();
 
   const sendTx = async (
     receiver: string,
     mintAddress: string,
     delegateAmnt: number,
-    transferAmnt: number
+    transferAmnt: number,
+    scheduleStr: ConvertableString
   ) => {
     if (!program || !provider) {
       console.log("Missing provider");
       return;
     }
 
-    // const receiverKey = new PublicKey(receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
-    const receiverKey = new PublicKey(
-      "CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd"
-    );
-    // const mintKey = new PublicKey(mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-    const mintKey = new PublicKey(
-      "JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj"
-    );
+    const receiverKey = new PublicKey(receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
+    // const receiverKey = new PublicKey(
+    //   "B2B2XZpk2a9hvpNBpXYNdZxg3Sy5WJb34wdoDgb5VFJ8"
+    // );
+    const mintKey = new PublicKey(mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    // const mintKey = new PublicKey(
+    //   "JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj"
+    // );
 
     const ixs: TransactionInstruction[] = [];
 
@@ -81,22 +99,29 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
         mint: mintKey,
         transferAmount: new BN(transferAmnt),
         threadId: nextThreadId,
-        threadTrigger: { now: {} },
+        threadTrigger: convertStringToSchedule(scheduleStr),
         program,
       })
     );
 
-    await constructSetupLink({
-      taOwner: provider.publicKey.toBase58(),
+    const qr = await constructSetupIxQR({
       receiver: receiverKey.toBase58(),
       mint: mintKey.toBase58(),
       amount: transferAmnt,
       delegateAmount: delegateAmnt,
-      threadSchedule: "{ now: {} }",
+      threadSchedule: scheduleStr,
     });
-    // const sig = await signAndSendTransaction(ixs, provider);
+
+    // qr._svg
+    // if (qrRef.current) {
+    //   qrRef.current.innerHTML = "";
+    //   qr.append(qrRef.current);
+    // }
+
+    const sig = await signAndSendTransaction(ixs, provider);
     setShowModal(false);
-    // console.log(sig);
+
+    console.log(sig);
   };
 
   return (
@@ -114,7 +139,8 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
               vals.receiver,
               vals.mintAddress,
               vals.delegateAmnt,
-              vals.transferAmnt
+              vals.transferAmnt,
+              scheduleStr
             );
           }}
         >
@@ -150,12 +176,64 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
                   onChangeText={props.handleChange("transferAmnt")}
                   placeholder="Amount to Transfer"
                 />
+                <SelectDropdown
+                  data={["Immediate", "Daily", "Weekly", "Monthly", "Yearly"]}
+                  onSelect={(item) => {
+                    setScheduleStr(item);
+                  }}
+                  buttonTextAfterSelection={(item) => item}
+                  rowTextForSelection={(item) => item}
+                />
               </View>
               <Button onPress={props.handleSubmit} title="Send Tx" />
             </View>
           )}
         </Formik>
+        <Section title="Test" className="mt-4">
+          <Button
+            title={"Create Test Payment"}
+            onPress={async () => {
+              if (!program || !provider) {
+                console.log("Cannot process tx at this time");
+                return;
+              }
+
+              const xNftTestKp = Keypair.fromSecretKey(Uint8Array.from(testKp));
+              const ata = await getOrCreateAssociatedTokenAccount(
+                provider.connection,
+                xNftTestKp,
+                TEST_MINT_ADDRESS,
+                provider.publicKey
+              );
+
+              if (ata.amount.toString() === "0") {
+                await mintTo(
+                  provider.connection,
+                  xNftTestKp,
+                  TEST_MINT_ADDRESS,
+                  ata.address,
+                  xNftTestKp,
+                  TEST_MINT_AMOUNT
+                );
+              }
+
+              sendTx(
+                provider?.publicKey.toString(),
+                TEST_MINT_ADDRESS.toString(),
+                TEST_MINT_AMOUNT,
+                10,
+                "TEST"
+              );
+            }}
+          />
+          <Text>
+            Create a test payment that sends tokens to your own token account
+            every minute.
+          </Text>
+          <Text>The tokens are provided for you.</Text>
+        </Section>
       </View>
+      <View ref={qrRef} />
     </View>
   );
 };

@@ -175,7 +175,6 @@ export function useSolanaProvider(): ProviderContextState {
   const [provider, setProvider] = useState<AnchorProvider>();
 
   useEffect(() => {
-    console.log("Poop");
     const connection = xNftConnection
       ? xNftConnection
       : adapterConnection.connection;

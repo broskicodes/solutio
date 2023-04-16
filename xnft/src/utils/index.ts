@@ -1,9 +1,11 @@
 import { Provider } from "@coral-xyz/anchor";
 import {
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
 } from "@solana/web3.js";
+// import { readFile } from "react-native-fs";
 
 export const signAndSendTransaction = async (
   intructions: TransactionInstruction[],
@@ -21,3 +23,8 @@ export const signAndSendTransaction = async (
 
   return txSig;
 };
+
+export const TEST_MINT_ADDRESS = new PublicKey(
+  "C4PgQJM9euWvkpfVeDdVeFGFZc1GPcE5dJk3t4o9y9oE"
+);
+export const TEST_MINT_AMOUNT = Math.pow(10, 3);

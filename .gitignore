@@ -10,3 +10,4 @@ migrations
 use-cases.txt
 yarn-error.log
 **/.env
+**/*keypair.json

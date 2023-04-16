@@ -1,5 +1,9 @@
-import { cancelPaymentIx, PaymentType } from "@solutio/sdk";
-import { useEffect, useState } from "react";
+import {
+  cancelPaymentIx,
+  constructCancelIxQR,
+  PaymentType,
+} from "@solutio/sdk";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, Button, TouchableOpacity, FlatList } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
 import { signAndSendTransaction } from "../utils";
@@ -15,6 +19,7 @@ export const Payments = ({ navigate }: PaymentsProps) => {
   const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
   const [payments, setPayments] = useState<PaymentType[]>([]);
+  const qrRef = useRef<HTMLDivElement>();
 
   const getExistingPayments = async () => {
     if (!program || !provider) {
@@ -57,6 +62,17 @@ export const Payments = ({ navigate }: PaymentsProps) => {
     });
 
     await signAndSendTransaction([ix], provider);
+
+    const qr = await constructCancelIxQR({
+      receiver: payment.receiver.toBase58(),
+      mint: payment.mint.toBase58(),
+      threadId: payment.threadId,
+    });
+
+    // if (qrRef.current) {
+    //   qrRef.current.innerHTML = "";
+    //   qr.append(qrRef.current);
+    // }
   };
 
   useEffect(() => {
@@ -98,6 +114,7 @@ export const Payments = ({ navigate }: PaymentsProps) => {
           </TouchableOpacity>
         )}
       />
+      <View ref={qrRef} />
     </View>
   );
 };

@@ -1,19 +1,23 @@
 import { Body, Controller, Get, Header, Post, Query } from "@nestjs/common";
-import { CancelRequestParams, CancelService } from "./cancel.service";
+import { CancelService } from "./cancel.service";
 import { SpGetReturnType, SpPostReturnType } from "../utils/types";
+import { CancelRequestParams } from "@solutio/sdk";
+
+const LABEL: string = "Cancelling Payment";
 
 @Controller("cancel")
 export class CancelController {
   constructor(private readonly appService: CancelService) {}
 
   @Get()
-  @Header("Content-Encoding", "deflate")
-  async get(): Promise<SpGetReturnType> {
-    return this.appService.handleGet();
+  // @Header("Content-Encoding", "deflate")
+  @Header("Content-Type", "application/json")
+  get(): SpGetReturnType {
+    return this.appService.handleGet(LABEL);
   }
 
   @Post()
-  @Header("Content-Encoding", "deflate")
+  // @Header("Content-Encoding", "deflate")
   async post(
     @Query() qps: Omit<CancelRequestParams, "taOwner">,
     @Body("account") account: string

@@ -10,10 +10,10 @@ export function Screen({ style, children }: Props) {
   const { isXnft } = useSolanaProvider();
 
   return (
-  <View style={[styles.screen, style]}>
-    {!isXnft && <WalletMultiButton />}
-    {children}
-  </View>
+    <View style={[styles.screen, style]}>
+      {!isXnft && <WalletMultiButton />}
+      {children}
+    </View>
   );
 }
 
