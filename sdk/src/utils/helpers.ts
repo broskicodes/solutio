@@ -6,7 +6,9 @@ import {
   Connection,
   TransactionInstruction,
   Transaction,
+  Keypair,
 } from "@solana/web3.js";
+import { BN } from "bn.js";
 import solutioIdl from "../../SolutioIDL.json";
 import {
   SOLUTIO_PROGRAM_ID,
@@ -16,6 +18,8 @@ import {
 import {
   CancelRequestParams,
   ConvertableString,
+  PaymentType,
+  SeriaizeablePaymentType,
   SetupRequestParams,
   ThreadTrigger,
   UpdateRequestParams,
@@ -68,7 +72,8 @@ export const getNextThreadId = async (
 
 export const signAndSendTransaction = async (
   intructions: TransactionInstruction[],
-  provider: Provider
+  provider: Provider,
+  signers: Keypair[] = []
 ) => {
   const tx = new Transaction();
   tx.add(...intructions);
@@ -78,7 +83,7 @@ export const signAndSendTransaction = async (
     return;
   }
 
-  const txSig = await provider.sendAndConfirm(tx);
+  const txSig = await provider.sendAndConfirm(tx, signers);
 
   return txSig;
 };
@@ -198,4 +203,34 @@ export const convertStringToSchedule = (
       throw new Error("Invalid conversion string.");
     }
   }
+};
+
+export const serializePaymentType = (
+  pt: PaymentType
+): SeriaizeablePaymentType => {
+  return {
+    ...pt,
+    threadAuthority: pt.threadAuthority.toBase58(),
+    tokenAuthority: pt.tokenAuthority.toBase58(),
+    threadKey: pt.threadKey.toBase58(),
+    payer: pt.payer.toBase58(),
+    receiver: pt.receiver.toBase58(),
+    mint: pt.mint.toBase58(),
+    amount: pt.amount.toNumber(),
+  };
+};
+
+export const deserializePaymentType = (
+  pt: SeriaizeablePaymentType
+): PaymentType => {
+  return {
+    ...pt,
+    threadAuthority: new PublicKey(pt.threadAuthority),
+    tokenAuthority: new PublicKey(pt.tokenAuthority),
+    threadKey: new PublicKey(pt.threadKey),
+    payer: new PublicKey(pt.payer),
+    receiver: new PublicKey(pt.receiver),
+    mint: new PublicKey(pt.mint),
+    amount: new BN(pt.amount),
+  };
 };

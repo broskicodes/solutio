@@ -1,10 +1,9 @@
 import { NotificationsScreen, SetupScreen, PaymentScreen } from "../screens/";
-// import { TokenListNavigator } from "./screens/ManageScreen";
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
-import { PaymentType } from "@solutio/sdk";
+import { SeriaizeablePaymentType } from "@solutio/sdk";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -18,7 +17,7 @@ export type HomeScreenProps = NativeStackScreenProps<
 
 export type HomeStackParamList = {
   Home: undefined;
-  Payment: { payment: PaymentType };
+  Payment: { payment: SeriaizeablePaymentType };
 };
 
 export const HomeStackNavigator = () => {
@@ -33,13 +32,13 @@ export const HomeStackNavigator = () => {
 export const TabNavigator = () => {
   return (
     <HomeTab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Main"
       screenOptions={{
         tabBarActiveTintColor: "#e91e63",
       }}
     >
       <HomeTab.Screen
-        name="Home"
+        name="Main"
         component={HomeStackNavigator}
         options={{
           headerShown: false,
@@ -49,17 +48,6 @@ export const TabNavigator = () => {
           ),
         }}
       />
-      {/* <HomeTab.Screen
-        name="List"
-        component={TokenListNavigator}
-        options={{
-          headerShown: false,
-          tabBarLabel: "Tokens",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="bank" color={color} size={size} />
-          ),
-        }}
-      /> */}
       <HomeTab.Screen
         name="Notifications"
         component={NotificationsScreen}

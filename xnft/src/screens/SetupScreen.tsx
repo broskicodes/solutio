@@ -9,6 +9,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export function SetupScreen({ navigation }: HomeScreenProps) {
   const [showModal, setShowModal] = useState(false);
+  const [temp, setTemp] = useState(0);
 
   return (
     <Screen>
@@ -22,10 +23,15 @@ export function SetupScreen({ navigation }: HomeScreenProps) {
             }}
           />
         </View>
-        <NewPayment setShowModal={setShowModal} />
+        <NewPayment setShowModal={setShowModal} setTemp={setTemp} />
       </Modal>
       <Section title="Scheduled Payments">
-        <Payments navigate={navigation.navigate} goBack={navigation.goBack} />
+        <Payments
+          navigate={navigation.navigate}
+          goBack={navigation.goBack}
+          temp={temp}
+          setTemp={setTemp}
+        />
       </Section>
       <Button
         onPress={() => {

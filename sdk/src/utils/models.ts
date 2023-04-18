@@ -33,6 +33,19 @@ export interface PaymentType {
   schedule: ThreadTrigger;
 }
 
+export interface SeriaizeablePaymentType {
+  threadAuthority: string;
+  tokenAuthority: string;
+  threadKey: string;
+  threadId: number;
+  payer: string;
+  receiver: string;
+  mint: string;
+  status: PaymentStatus;
+  amount: number;
+  schedule: ThreadTrigger;
+}
+
 export interface SolutioIxParams {
   taOwner: PublicKey;
   receiver: PublicKey;
