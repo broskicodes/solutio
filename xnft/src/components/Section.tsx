@@ -17,11 +17,13 @@ export function Section({ title, children }: Props) {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
+    flex: 1,
   },
   title: {
     textAlign: "center",
   },
   example: {
     marginTop: 8,
+    flex: 1,
   },
 });

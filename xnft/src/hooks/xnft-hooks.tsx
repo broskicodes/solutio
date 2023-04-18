@@ -159,7 +159,11 @@ export function useDimensions(debounceMs = 0) {
   return dimensions;
 }
 
-export function useSolanaProvider(): AnchorProvider | undefined {
+interface ProviderContextState {
+  provider: AnchorProvider | undefined;
+}
+
+export function useSolanaProvider(): ProviderContextState {
   const connection = useSolanaConnection();
   const [provider, setProvider] = useState<AnchorProvider>();
 
@@ -175,11 +179,11 @@ export function useSolanaProvider(): AnchorProvider | undefined {
     }
   }, [connection, setProvider]);
 
-  return provider;
+  return { provider };
 }
 
 export function useAnchorProgram(): Program | undefined {
-  const provider = useSolanaProvider();
+  const { provider } = useSolanaProvider();
   const [program, setProgram] = useState<Program>();
 
   useEffect(() => {

@@ -1,9 +1,17 @@
 import { Program, BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 
+export type ConvertableString =
+  | "Immediate"
+  | "Daily"
+  | "Weekly"
+  | "Monthly"
+  | "Yearly"
+  | "TEST";
+
 export interface ThreadTrigger {
   now?: {};
-  cron?: { scheduleStr: String };
+  cron?: { scheduleStr: string };
 }
 
 export interface PaymentStatus {
@@ -22,6 +30,19 @@ export interface PaymentType {
   mint: PublicKey;
   status: PaymentStatus;
   amount: BN;
+  schedule: ThreadTrigger;
+}
+
+export interface SeriaizeablePaymentType {
+  threadAuthority: string;
+  tokenAuthority: string;
+  threadKey: string;
+  threadId: number;
+  payer: string;
+  receiver: string;
+  mint: string;
+  status: PaymentStatus;
+  amount: number;
   schedule: ThreadTrigger;
 }
 
@@ -49,5 +70,27 @@ export interface UpdatePaymentParams extends SolutioIxParams {
 }
 
 export interface CancelPaymentParams extends SolutioIxParams {
+  threadId: number;
+}
+
+export interface SolutioRequestParams {
+  taOwner: string;
+  receiver: string;
+  mint: string;
+}
+
+export interface SetupRequestParams extends SolutioRequestParams {
+  amount: number;
+  threadSchedule: ConvertableString;
+  delegateAmount?: number;
+}
+
+export interface UpdateRequestParams extends SolutioRequestParams {
+  threadId: number;
+  newAmount: number | null;
+  newSchedule: ConvertableString | null;
+}
+
+export interface CancelRequestParams extends SolutioRequestParams {
   threadId: number;
 }

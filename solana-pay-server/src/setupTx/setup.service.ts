@@ -1,46 +1,22 @@
-import { Program, Provider, AnchorProvider, BN } from "@coral-xyz/anchor";
+import { BN } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import {
+  convertStringToSchedule,
   delegateTransferAuthorityIx,
   getNextThreadId,
-  getSolutioProgram,
   getThreadAuthorityPDA,
   getTokenAuthPDA,
-  serializeTransactionToBase64,
   setupPaymentIx,
+  SetupRequestParams,
 } from "@solutio/sdk";
-import {
-  ICON_URI,
-  SolutioRequestParams,
-  SpGetReturnType,
-  SpPostReturnType,
-} from "../utils/types";
-
-const LABEL: string = "Creating New Payment";
-
-export interface SetupRequestParams extends SolutioRequestParams {
-  amount: number;
-  threadSchedule: string;
-  delegateAmount?: number;
-}
+import { SolutioInstructionService, SpPostReturnType } from "../utils/types";
 
 @Injectable()
-export class SetupService {
-  private provider: Provider;
-  private program: Program;
-
+export class SetupService extends SolutioInstructionService {
   constructor() {
-    this.provider = AnchorProvider.env();
-    this.program = getSolutioProgram(this.provider);
-  }
-
-  handleGet(): SpGetReturnType {
-    return {
-      icon: ICON_URI,
-      label: LABEL,
-    };
+    super();
   }
 
   async handlePost({
@@ -98,12 +74,12 @@ export class SetupService {
         mint: mintKey,
         threadId: nextThreadId,
         transferAmount: new BN(amount),
-        threadTrigger: {}, // process threadSchedule and replace
+        threadTrigger: convertStringToSchedule(threadSchedule),
         program: this.program,
       })
     );
 
-    const b64Tx = serializeTransactionToBase64(ixs);
+    const b64Tx = await this.getSerializedTransaction(ixs);
 
     return {
       transaction: b64Tx,

@@ -1,21 +1,25 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { cancelPaymentIx, updatePaymentIx } from "@solutio/sdk";
+import {
+  cancelPaymentIx,
+  deserializePaymentType,
+  updatePaymentIx,
+  signAndSendTransaction,
+} from "@solutio/sdk";
 import { BN } from "bn.js";
 import { useState } from "react";
 import { Button, Modal } from "react-native";
 import { Text, TextInput, View } from "react-native";
 import { Screen } from "../components/Screen";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
-import { signAndSendTransaction } from "../utils";
 import { HomeStackParamList } from "../utils/navigators";
 import { Formik } from "formik";
 
 export const PaymentScreen = ({
   route,
 }: NativeStackScreenProps<HomeStackParamList, "Payment">) => {
-  const { payment } = route.params;
-  const provider = useSolanaProvider();
+  const payment = deserializePaymentType(route.params.payment);
+  const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
   const [showUpdateModal, setShowUpadteModal] = useState(false);
 
@@ -32,7 +36,7 @@ export const PaymentScreen = ({
       threadId: payment.threadId,
       program,
       newAmount: newAmnt > 0 ? new BN(newAmnt) : null,
-      newSchedule: null // For now
+      newSchedule: null, // For now
     });
 
     const sig = await signAndSendTransaction([ix], provider);
@@ -51,8 +55,8 @@ export const PaymentScreen = ({
       receiver: payment.receiver,
       mint: payment.mint,
       threadId: payment.threadId,
-      program
-  });
+      program,
+    });
 
     const sig = await signAndSendTransaction([ix], provider);
     console.log(sig);

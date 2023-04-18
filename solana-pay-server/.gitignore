@@ -1,2 +1,2 @@
-dist/
-*-keypair.json
+app.yaml
+.gcloudignore

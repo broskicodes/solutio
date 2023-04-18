@@ -1,6 +1,6 @@
 import { registerRootComponent } from "expo";
 import { RecoilRoot } from "recoil";
-import { ActivityIndicator, View, Text } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { useFonts, Inter_900Black } from "@expo-google-fonts/dev";
 import { TabNavigator } from "./utils/navigators";

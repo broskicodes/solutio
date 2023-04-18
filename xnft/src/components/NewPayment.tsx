@@ -1,47 +1,57 @@
-import { PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import {
+  ConvertableString,
+  convertStringToSchedule,
   delegateTransferAuthorityIx,
   getNextThreadId,
   getThreadAuthorityPDA,
   getTokenAuthPDA,
   setupPaymentIx,
+  signAndSendTransaction,
 } from "@solutio/sdk";
-import { Button, TextInput, View } from "react-native";
+import { Button, Text, TextInput, View } from "react-native";
 import { useAnchorProgram, useSolanaProvider } from "../hooks/xnft-hooks";
-import { signAndSendTransaction } from "../utils";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { TEST_MINT_ADDRESS, TEST_MINT_AMOUNT } from "../utils";
+import {
+  createAssociatedTokenAccountInstruction,
+  createMintToInstruction,
+  getAccount,
+  getAssociatedTokenAddress,
+} from "@solana/spl-token";
 import { Formik } from "formik";
+import { useRef, useState } from "react";
+import testKp from "../../test-mint-auth-keypair.json";
+import { Section } from "./Section";
+import { Picker } from "@react-native-picker/picker";
 
 interface NewPaymentProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setTemp: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
-  const provider = useSolanaProvider();
+export const NewPayment = ({ setShowModal, setTemp }: NewPaymentProps) => {
+  const { provider } = useSolanaProvider();
   const program = useAnchorProgram();
+  const [scheduleStr, setScheduleStr] =
+    useState<ConvertableString>("Immediate");
 
   const sendTx = async (
     receiver: string,
     mintAddress: string,
     delegateAmnt: number,
-    transferAmnt: number
+    transferAmnt: number,
+    scheduleStr: ConvertableString,
+    ixs: TransactionInstruction[] = [],
+    signers: Keypair[] = []
   ) => {
     if (!program || !provider) {
       console.log("Missing provider");
       return;
     }
 
-    // const receiverKey = new PublicKey(receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
-    const receiverKey = new PublicKey(
-      "CrfpUKyn8XhpWfoiGSX6rKpbqpPJZ6QJwaQbBrvZVQrd"
-    );
-    // const mintKey = new PublicKey(mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-    const mintKey = new PublicKey(
-      "JLH6X6GUoBj9D3MYqoptAwPZT6yZtSyMHV28aMd2GQj"
-    );
-
-    const ixs: TransactionInstruction[] = [];
+    const receiverKey = new PublicKey(receiver); // BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt
+    const mintKey = new PublicKey(mintAddress); // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
 
     const userTa = await getAssociatedTokenAddress(
       mintKey,
@@ -62,8 +72,8 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
           receiver: receiverKey,
           mint: mintKey,
           delegateAmount: new BN(delegateAmnt),
-          program
-      })
+          program,
+        })
       );
     }
 
@@ -80,13 +90,28 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
         mint: mintKey,
         transferAmount: new BN(transferAmnt),
         threadId: nextThreadId,
-        threadTrigger: { now: {} },
-        program
+        threadTrigger: convertStringToSchedule(scheduleStr),
+        program,
       })
     );
 
-    const sig = await signAndSendTransaction(ixs, provider);
+    // const qr = await constructSetupIxQR({
+    //   receiver: receiverKey.toBase58(),
+    //   mint: mintKey.toBase58(),
+    //   amount: transferAmnt,
+    //   delegateAmount: delegateAmnt,
+    //   threadSchedule: scheduleStr,
+    // });
+
+    // qr._svg
+    // if (qrRef.current) {
+    //   qrRef.current.innerHTML = "";
+    //   qr.append(qrRef.current);
+    // }
+
+    const sig = await signAndSendTransaction(ixs, provider, signers);
     setShowModal(false);
+
     console.log(sig);
   };
 
@@ -105,7 +130,8 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
               vals.receiver,
               vals.mintAddress,
               vals.delegateAmnt,
-              vals.transferAmnt
+              vals.transferAmnt,
+              scheduleStr
             );
           }}
         >
@@ -141,12 +167,81 @@ export const NewPayment = ({ setShowModal }: NewPaymentProps) => {
                   onChangeText={props.handleChange("transferAmnt")}
                   placeholder="Amount to Transfer"
                 />
+                <Picker
+                  selectedValue={scheduleStr}
+                  onValueChange={(val) => setScheduleStr(val)}
+                >
+                  {["Immediate", "Daily", "Weekly", "Monthly", "Yearly"].map(
+                    (val) => (
+                      <Picker.Item key={val} label={val} value={val} />
+                    )
+                  )}
+                </Picker>
               </View>
               <Button onPress={props.handleSubmit} title="Send Tx" />
             </View>
           )}
         </Formik>
+        <Section title="Test" className="mt-4">
+          <Button
+            title={"Create Test Payment"}
+            onPress={async () => {
+              if (!program || !provider) {
+                console.log("Cannot process tx at this time");
+                return;
+              }
+
+              const taIxs: TransactionInstruction[] = [];
+              const xNftTestKp = Keypair.fromSecretKey(Uint8Array.from(testKp));
+
+              const ata = await getAssociatedTokenAddress(
+                TEST_MINT_ADDRESS,
+                provider.publicKey
+              );
+
+              const ta = await getAccount(provider.connection, ata);
+
+              if (!ta) {
+                taIxs.push(
+                  createAssociatedTokenAccountInstruction(
+                    xNftTestKp.publicKey,
+                    ata,
+                    provider.publicKey,
+                    TEST_MINT_ADDRESS
+                  )
+                );
+              }
+
+              if (!ta || ta.amount.toString() === "0") {
+                taIxs.push(
+                  createMintToInstruction(
+                    TEST_MINT_ADDRESS,
+                    ata,
+                    xNftTestKp.publicKey,
+                    TEST_MINT_AMOUNT
+                  )
+                );
+              }
+
+              sendTx(
+                provider?.publicKey.toString(),
+                TEST_MINT_ADDRESS.toString(),
+                TEST_MINT_AMOUNT,
+                10,
+                "TEST",
+                taIxs,
+                taIxs.length > 0 ? [xNftTestKp] : []
+              );
+            }}
+          />
+          <Text>
+            Create a test payment that sends tokens to your own token account
+            every minute.
+          </Text>
+          <Text>The tokens are provided for you.</Text>
+        </Section>
       </View>
+      {/* <View ref={qrRef} /> */}
     </View>
   );
 };

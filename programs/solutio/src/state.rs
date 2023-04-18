@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 #[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]
 pub enum AcceptedTriggers {
     Now,
-    Cron { schedule_str: [u8; 128] },
+    Cron { schedule_str: String },
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]

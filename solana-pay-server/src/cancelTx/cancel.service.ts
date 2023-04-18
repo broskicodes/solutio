@@ -1,39 +1,12 @@
-import { Program, Provider, AnchorProvider } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
-import {
-  cancelPaymentIx,
-  getSolutioProgram,
-  serializeTransactionToBase64,
-} from "@solutio/sdk";
-import {
-  ICON_URI,
-  SolutioRequestParams,
-  SpGetReturnType,
-  SpPostReturnType,
-} from "../utils/types";
-
-const LABEL: string = "Cancelling Payment";
-
-export interface CancelRequestParams extends SolutioRequestParams {
-  threadId: number;
-}
+import { cancelPaymentIx, CancelRequestParams } from "@solutio/sdk";
+import { SolutioInstructionService, SpPostReturnType } from "../utils/types";
 
 @Injectable()
-export class CancelService {
-  private provider: Provider;
-  private program: Program;
-
+export class CancelService extends SolutioInstructionService {
   constructor() {
-    this.provider = AnchorProvider.env();
-    this.program = getSolutioProgram(this.provider);
-  }
-
-  handleGet(): SpGetReturnType {
-    return {
-      icon: ICON_URI,
-      label: LABEL,
-    };
+    super();
   }
 
   async handlePost({
@@ -58,7 +31,7 @@ export class CancelService {
       })
     );
 
-    const b64Tx = serializeTransactionToBase64(ixs);
+    const b64Tx = await this.getSerializedTransaction(ixs);
 
     return {
       transaction: b64Tx,

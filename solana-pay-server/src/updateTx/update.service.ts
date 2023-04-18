@@ -1,41 +1,17 @@
-import { Program, Provider, AnchorProvider, BN } from "@coral-xyz/anchor";
+import { BN } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import {
-  getSolutioProgram,
-  serializeTransactionToBase64,
+  convertStringToSchedule,
   updatePaymentIx,
+  UpdateRequestParams,
 } from "@solutio/sdk";
-import {
-  ICON_URI,
-  SolutioRequestParams,
-  SpGetReturnType,
-  SpPostReturnType,
-} from "../utils/types";
-
-const LABEL: string = "Updating Payment";
-
-export interface UpdateRequestParams extends SolutioRequestParams {
-  threadId: number;
-  newAmount: number | null;
-  newSchedule: string | null;
-}
+import { SolutioInstructionService, SpPostReturnType } from "../utils/types";
 
 @Injectable()
-export class UpdateService {
-  private provider: Provider;
-  private program: Program;
-
+export class UpdateService extends SolutioInstructionService {
   constructor() {
-    this.provider = AnchorProvider.env();
-    this.program = getSolutioProgram(this.provider);
-  }
-
-  handleGet(): SpGetReturnType {
-    return {
-      icon: ICON_URI,
-      label: LABEL,
-    };
+    super();
   }
 
   async handlePost({
@@ -60,11 +36,11 @@ export class UpdateService {
         threadId,
         program: this.program,
         newAmount: newAmount ? new BN(newAmount) : null,
-        newSchedule: null, // process newSchedule then replace
+        newSchedule: newSchedule ? convertStringToSchedule(newSchedule) : null,
       })
     );
 
-    const b64Tx = serializeTransactionToBase64(ixs);
+    const b64Tx = await this.getSerializedTransaction(ixs);
 
     return {
       transaction: b64Tx,
