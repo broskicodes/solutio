@@ -1,4 +1,4 @@
-import { Program, Provider, AnchorProvider, BN } from "@coral-xyz/anchor";
+import { BN } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
@@ -6,19 +6,12 @@ import {
   convertStringToSchedule,
   delegateTransferAuthorityIx,
   getNextThreadId,
-  getSolutioProgram,
   getThreadAuthorityPDA,
   getTokenAuthPDA,
-  serializeTransactionToBase64,
   setupPaymentIx,
   SetupRequestParams,
 } from "@solutio/sdk";
-import {
-  ICON_URI,
-  SolutioInstructionService,
-  SpGetReturnType,
-  SpPostReturnType,
-} from "../utils/types";
+import { SolutioInstructionService, SpPostReturnType } from "../utils/types";
 
 @Injectable()
 export class SetupService extends SolutioInstructionService {

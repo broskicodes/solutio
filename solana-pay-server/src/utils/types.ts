@@ -1,6 +1,12 @@
 import { AnchorProvider, Program, Provider } from "@coral-xyz/anchor";
 import { TransactionInstruction } from "@solana/web3.js";
-import { CancelRequestParams, getSolutioProgram, serializeTransactionToBase64, SetupRequestParams, UpdateRequestParams } from "@solutio/sdk";
+import {
+  CancelRequestParams,
+  getSolutioProgram,
+  serializeTransactionToBase64,
+  SetupRequestParams,
+  UpdateRequestParams,
+} from "@solutio/sdk";
 
 export const ICON_URI = "";
 
@@ -16,7 +22,10 @@ export interface SpPostReturnType {
   messgae?: string;
 }
 
-export type AcceptedRequestParams = SetupRequestParams | UpdateRequestParams | CancelRequestParams;
+export type AcceptedRequestParams =
+  | SetupRequestParams
+  | UpdateRequestParams
+  | CancelRequestParams;
 
 export abstract class SolutioInstructionService {
   protected provider: Provider;
@@ -34,10 +43,15 @@ export abstract class SolutioInstructionService {
     };
   }
 
-  public abstract handlePost(params: AcceptedRequestParams): Promise<SpPostReturnType>;
+  public abstract handlePost(
+    params: AcceptedRequestParams
+  ): Promise<SpPostReturnType>;
 
-  protected async getSerializedTransaction(ixs: TransactionInstruction[]): Promise<string> {
-    const { blockhash, lastValidBlockHeight} = await this.provider.connection.getLatestBlockhash();
+  protected async getSerializedTransaction(
+    ixs: TransactionInstruction[]
+  ): Promise<string> {
+    const { blockhash, lastValidBlockHeight } =
+      await this.provider.connection.getLatestBlockhash();
     return serializeTransactionToBase64(ixs, blockhash, lastValidBlockHeight);
   }
 }

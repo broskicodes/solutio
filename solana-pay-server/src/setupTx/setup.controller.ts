@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Header, Post, Query, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Post,
+  Query,
+  Res,
+} from "@nestjs/common";
 import { Response } from "express";
 import { SetupService } from "./setup.service";
 import { SpGetReturnType, SpPostReturnType } from "../utils/types";
@@ -16,7 +24,7 @@ export class SetupController {
   get(@Res() res: Response) {
     const v = this.appService.handleGet(LABEL);
     res.json(v);
-    
+
     // return v;
   }
 

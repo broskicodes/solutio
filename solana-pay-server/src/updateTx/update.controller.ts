@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { UpdateService } from "./update.service";
 import { SpGetReturnType, SpPostReturnType } from "../utils/types";
 import { UpdateRequestParams } from "@solutio/sdk";
@@ -17,7 +17,10 @@ export class UpdateController {
 
   @Post()
   // @Header("Content-Encoding", "deflate")
-  async post(@Query() qps: Omit<UpdateRequestParams, "taOwner">, @Body('account') account: string): Promise<SpPostReturnType> {
+  async post(
+    @Query() qps: Omit<UpdateRequestParams, "taOwner">,
+    @Body("account") account: string
+  ): Promise<SpPostReturnType> {
     return this.appService.handlePost({ ...qps, taOwner: account });
   }
 }

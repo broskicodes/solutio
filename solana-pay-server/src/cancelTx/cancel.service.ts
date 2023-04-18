@@ -1,25 +1,13 @@
-import { Program, Provider, AnchorProvider } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
-import {
-  cancelPaymentIx,
-  CancelRequestParams,
-  getSolutioProgram,
-  serializeTransactionToBase64,
-} from "@solutio/sdk";
-import {
-  ICON_URI,
-  SolutioInstructionService,
-  SpGetReturnType,
-  SpPostReturnType,
-} from "../utils/types";
-
+import { cancelPaymentIx, CancelRequestParams } from "@solutio/sdk";
+import { SolutioInstructionService, SpPostReturnType } from "../utils/types";
 
 @Injectable()
 export class CancelService extends SolutioInstructionService {
   constructor() {
     super();
-  }  
+  }
 
   async handlePost({
     taOwner,

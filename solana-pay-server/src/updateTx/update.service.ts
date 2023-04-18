@@ -1,19 +1,12 @@
-import { Program, Provider, AnchorProvider, BN } from "@coral-xyz/anchor";
+import { BN } from "@coral-xyz/anchor";
 import { Injectable } from "@nestjs/common";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import {
   convertStringToSchedule,
-  getSolutioProgram,
-  serializeTransactionToBase64,
   updatePaymentIx,
   UpdateRequestParams,
 } from "@solutio/sdk";
-import {
-  ICON_URI,
-  SolutioInstructionService,
-  SpGetReturnType,
-  SpPostReturnType,
-} from "../utils/types";
+import { SolutioInstructionService, SpPostReturnType } from "../utils/types";
 
 @Injectable()
 export class UpdateService extends SolutioInstructionService {
