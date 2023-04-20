@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types"],
     "lib": ["es2015", "dom"],
     "module": "commonjs",
     "target": "es6",
@@ -11,9 +10,8 @@
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "outDir": "./dist",
     "baseUrl": "./"
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modues"]
+  "include": ["solana-pay/src/**/*.ts", "payments/src/**/*.ts"],
+  "exclude": ["**/node_modues", "**/test", "**/dist", "**/*spec.ts"]
 }

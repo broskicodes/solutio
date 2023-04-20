@@ -1,0 +1,8 @@
+dispatch:
+  # Route requests for sps.solutioapp.xyz to the solana-pay service
+  - url: "sps.solutioapp.xyz/*"
+    service: solana-pay
+
+  # Route requests for payments.solutioapp.xyz to the payments service
+  - url: "payments.solutioapp.xyz/*"
+    service: payments

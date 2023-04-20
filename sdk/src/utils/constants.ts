@@ -19,4 +19,4 @@ export const COMPUTE_BUDGET_PROGRAM_ID = new PublicKey(
 
 // Misc
 export const NEXT_THREAD_ID_INDEX = 8 + 32;
-export const SOLANA_PAY_SERVER_URL = "https://sp.soruchio.xyz";
+export const SOLANA_PAY_SERVER_URL = "https://sps.solutioapp.xyz";
