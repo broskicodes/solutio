@@ -2,6 +2,10 @@
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { Wallet } from "./components/Wallet";
 
+interface ExpectedAppProps {
+
+}
+
 function App() {
   return (
     <div className="App">
