@@ -53,8 +53,12 @@ export interface SolutioIxParams {
   program: Program;
 }
 
-export interface DelegateTransferAuthority extends SolutioIxParams {
+export interface DelegateTransferAuthorityParams extends SolutioIxParams {
   delegateAmount: BN;
+}
+
+export interface TransferTokensDirectParams extends SolutioIxParams {
+  amount: BN;
 }
 
 export interface SetupPaymentParmas extends SolutioIxParams {
@@ -77,6 +81,10 @@ export interface SolutioRequestParams {
   taOwner: string;
   receiver: string;
   mint: string;
+}
+
+export interface DirectTransferRequestParams {
+  amount: number;
 }
 
 export interface SetupRequestParams extends SolutioRequestParams {

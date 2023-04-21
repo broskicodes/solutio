@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.3.0",
   "name": "solutio",
   "instructions": [
     {
@@ -47,6 +47,16 @@
         },
         {
           "name": "thread",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programAsSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -144,6 +154,18 @@
         {
           "name": "receiver",
           "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "programAsSigner",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "programTokenAccount",
+          "isMut": true,
           "isSigner": false,
           "isOptional": true
         },
@@ -345,7 +367,7 @@
       ]
     },
     {
-      "name": "transferTokens",
+      "name": "transferTokensViaAuthority",
       "accounts": [
         {
           "name": "tokenAccountAuthority",
@@ -375,6 +397,82 @@
         {
           "name": "receiver",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "signingThread",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "programAsSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferTokensDirect",
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiverTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccountOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "receiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programAsSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programTokenAccount",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -555,8 +653,5 @@
       "name": "MissingOptionalAccount",
       "msg": "Context is missing a required account"
     }
-  ],
-  "metadata": {
-    "address": "8sbSXaprHK3Mr9ft8QpAQqZHz4PEsaSH9dv5gAGtqcow"
-  }
+  ]
 }

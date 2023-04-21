@@ -6,6 +6,7 @@ import {
   getThreadAuthorityPDA,
   getThreadPDA,
   getTokenAuthPDA,
+  getProgramAsSignerPDA,
 } from "../utils";
 
 export const updatePaymentIx = async ({
@@ -29,6 +30,8 @@ export const updatePaymentIx = async ({
   const [threadAuth] = getThreadAuthorityPDA(taOwner);
   const [thread] = getThreadPDA(threadAuth, threadId);
   const [payment] = getPaymentPDA(taOwner, thread);
+  const [programSigner] = getProgramAsSignerPDA();
+  const programTa = await getAssociatedTokenAddress(mint, programSigner, true);
 
   const optAcnts = newAmount
     ? {
@@ -37,6 +40,8 @@ export const updatePaymentIx = async ({
         tokenAccount: ta,
         receiverTokenAccount: receiverTa,
         receiver,
+        programAsSigner: programSigner,
+        programTokenAccount: programTa
       }
     : {
         tokenAccountAuthority: undefined,
@@ -44,6 +49,8 @@ export const updatePaymentIx = async ({
         tokenAccount: undefined,
         receiverTokenAccount: undefined,
         receiver: undefined,
+        programAsSigner: undefined,
+        programTokenAccount: undefined
       };
 
   const ix = await program.methods

@@ -10,4 +10,6 @@ pub enum SolutioError {
     InvalidScheduleString,
     #[msg("Context is missing a required account")]
     MissingOptionalAccount,
+    #[msg("The provided mint address is not currently supported")]
+    UnsupportedMintAddress,
 }

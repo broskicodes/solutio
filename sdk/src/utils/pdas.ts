@@ -7,6 +7,7 @@ import {
   THREAD_AUTHORITY_SEED,
   TOKEN_AUTHORITY_SEED,
   PAYMENT_SEED,
+  PROGRAM_AS_SIGNER_SEED,
 } from "./constants";
 
 export const getThreadPDA = (authority: PublicKey, id: number) => {
@@ -49,3 +50,7 @@ export const getPaymentPDA = (taOwner: PublicKey, threadKey: PublicKey) => {
     SOLUTIO_PROGRAM_ID
   );
 };
+
+export const getProgramAsSignerPDA = () => {
+  return PublicKey.findProgramAddressSync([PROGRAM_AS_SIGNER_SEED], SOLUTIO_PROGRAM_ID);
+}
