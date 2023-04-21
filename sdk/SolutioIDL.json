@@ -652,6 +652,14 @@
       "code": 6003,
       "name": "MissingOptionalAccount",
       "msg": "Context is missing a required account"
+    },
+    {
+      "code": 6004,
+      "name": "UnsupportedMintAddress",
+      "msg": "The provided mint address is not currently supported"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "8sbSXaprHK3Mr9ft8QpAQqZHz4PEsaSH9dv5gAGtqcow"
+  }
 }
