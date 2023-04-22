@@ -129,7 +129,6 @@ describe("e2e thread tests", () => {
       receiver: receiver.publicKey,
       mint,
       transferAmount: amount,
-      threadId: THREAD_ID,
       threadTrigger: convertStringToSchedule("Immediate"),
       program
     });

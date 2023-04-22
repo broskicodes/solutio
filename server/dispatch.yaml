@@ -4,5 +4,5 @@ dispatch:
     service: solana-pay
 
   # Route requests for payments.solutioapp.xyz to the payments service
-  - url: "payments.solutioapp.xyz/*"
-    service: payments
+  # - url: "payments.solutioapp.xyz/*"
+  #   service: payments

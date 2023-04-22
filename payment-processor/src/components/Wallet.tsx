@@ -6,9 +6,7 @@ import {
     WalletMultiButton
 } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
-import rpcObj from '../sol-mb-rpc.json';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
-
 
 // Default styles that can be overridden by your app
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -22,19 +20,19 @@ export const Wallet = ({ children, network }: WalletProps) => {
     const { endpoint, config } =  
        useMemo(() => {
         return network === "mainnet-beta"
-          ? { endpoint: rpcObj.rpc, config: { wsEndpoint: rpcObj.ws } }
+          ? { endpoint: process.env.REACT_APP_MAINNET_RPC_URL, config: { wsEndpoint: process.env.REACT_APP_MAINNET_WSS_URL } }
           : { endpoint: clusterApiUrl(network), config: {} }
-      }, []);
+      }, [network]);
 
     const wallets = useMemo(
         () => [
           new PhantomWalletAdapter()
         ],
-        [network]
+        []
     );
 
     return (
-        <ConnectionProvider endpoint={endpoint} config={config}>
+        <ConnectionProvider endpoint={endpoint as string} config={{ ...config, commitment: "finalized" }}>
             <WalletProvider wallets={wallets} autoConnect>
                 <WalletModalProvider>
                     <WalletMultiButton />

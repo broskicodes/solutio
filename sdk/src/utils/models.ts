@@ -63,7 +63,6 @@ export interface TransferTokensDirectParams extends SolutioIxParams {
 
 export interface SetupPaymentParmas extends SolutioIxParams {
   transferAmount: BN;
-  threadId: number;
   threadTrigger: ThreadTrigger;
 }
 
