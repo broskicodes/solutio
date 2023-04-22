@@ -51,7 +51,11 @@ pub mod solutio {
         delegate_transfer_authority::handler(ctx, amount)
     }
 
-    pub fn transfer_tokens(ctx: Context<TransferTokens>, amount: u64) -> Result<()> {
-        transfer_tokens::handler(ctx, amount)
+    pub fn transfer_tokens_via_authority(ctx: Context<TransferTokensViaAuthority>, amount: u64) -> Result<()> {
+        transfer_tokens_via_authority::handler(ctx, amount)
+    }
+
+    pub fn transfer_tokens_direct(ctx: Context<TransferTokensDirect>, amount: u64) -> Result<()> {
+        transfer_tokens_direct::handler(ctx, amount)
     }
 }

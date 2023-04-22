@@ -1,6 +1,6 @@
 use crate::{
     error::SolutioError,
-    state::{AcceptedTriggers, Payment, PaymentStatus, ThreadAuthority, TokenAuthority},
+    state::{AcceptedTriggers, Payment, PaymentStatus, ThreadAuthority, TokenAuthority, USDC_MINT_ADDRESS, PROGRAM_AS_SIGNER_SEED},
     util::verify_trigger,
 };
 
@@ -15,6 +15,7 @@ use clockwork_sdk::{
     ThreadProgram,
 };
 use clockwork_thread_program::{state::SEED_THREAD, ID as THREAD_PROGRAM_ID};
+use std::str::FromStr;
 
 #[derive(Accounts)]
 pub struct SetupNewPayment<'info> {
@@ -51,7 +52,7 @@ pub struct SetupNewPayment<'info> {
         bump
     )]
     pub payment: Box<Account<'info, Payment>>,
-    // TODO: Limit mint to Wrapped Sol or USDC
+    #[account(address = Pubkey::from_str(USDC_MINT_ADDRESS).unwrap() @ SolutioError::UnsupportedMintAddress)]
     pub mint: Box<Account<'info, Mint>>,
     // Need not be assosiated ta
     #[account(
@@ -83,6 +84,17 @@ pub struct SetupNewPayment<'info> {
         seeds::program = THREAD_PROGRAM_ID
     )]
     pub thread: UncheckedAccount<'info>,
+    #[account(
+        seeds = [PROGRAM_AS_SIGNER_SEED],
+        bump
+    )]
+    pub program_as_signer: SystemAccount<'info>,
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = program_as_signer,
+    )]
+    pub program_token_account: Box<Account<'info, TokenAccount>>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -128,28 +140,29 @@ pub fn handler(
     );
 
     let trigger = verify_trigger(thread_trigger.clone())?;
-    let kickoff_ix_data = crate::instruction::TransferTokens {
+    let kickoff_ix_data = crate::instruction::TransferTokensViaAuthority {
         amount: transfer_amount,
     };
 
-    let acnts = crate::token::TransferTokens {
-        token_account_authority: ctx.accounts.token_account_authority.clone(),
-        mint: ctx.accounts.mint.clone(),
-        token_account: ctx.accounts.token_account.clone(),
-        receiver_token_account: ctx.accounts.receiver_token_account.clone(),
-        token_account_owner: UncheckedAccount::try_from(
-            ctx.accounts.token_account_owner.to_account_info(),
-        ),
-        receiver: ctx.accounts.receiver.clone(),
-        system_program: ctx.accounts.system_program.clone(),
-        token_program: ctx.accounts.token_program.clone(),
-        associated_token_program: ctx.accounts.associated_token_program.clone(),
+    let acnts = crate::accounts::TransferTokensViaAuthority {
+        token_account_authority: ctx.accounts.token_account_authority.key(),
+        mint: ctx.accounts.mint.key(),
+        token_account: ctx.accounts.token_account.key(),
+        receiver_token_account: ctx.accounts.receiver_token_account.key(),
+        token_account_owner: ctx.accounts.token_account_owner.key(),
+        receiver: ctx.accounts.receiver.key(),
+        signing_thread: ctx.accounts.thread.key(),
+        program_as_signer: ctx.accounts.program_as_signer.key(),
+        program_token_account: ctx.accounts.program_token_account.key(),
+        system_program: ctx.accounts.system_program.key(),
+        token_program: ctx.accounts.token_program.key(),
+        associated_token_program: ctx.accounts.associated_token_program.key(),
     }
     .to_account_metas(None)
     .into_iter()
     .map(|meta| SerializableAccount {
         pubkey: meta.pubkey,
-        is_signer: false,
+        is_signer: meta.pubkey.eq(ctx.accounts.thread.key),
         is_writable: meta.is_writable,
     })
     .collect();
@@ -162,7 +175,7 @@ pub fn handler(
 
     thread_create(
         cpi_ctx,
-        100000000, // Justify this amount
+        10000000, // Justify this amount
         vec![ctx.accounts.thread_authority.next_thread_id],
         vec![kickoff_ix],
         trigger,

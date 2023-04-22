@@ -1,5 +1,11 @@
 use anchor_lang::prelude::*;
 
+// Constants
+pub const USDC_MINT_ADDRESS: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+pub const PROGRAM_AS_SIGNER_SEED: &[u8] = b"program_signer";
+pub const PROGRAM_SERVICE_FEE_BASIS_POINTS: u16 = 69;
+
+// Enums
 #[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]
 pub enum AcceptedTriggers {
     Now,
@@ -13,6 +19,7 @@ pub enum PaymentStatus {
     Complete,
 }
 
+// Accounts
 #[account]
 pub struct TokenAuthority {
     pub token_account_owner: Pubkey,

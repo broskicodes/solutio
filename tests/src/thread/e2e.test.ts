@@ -1,6 +1,6 @@
 import { Program, BN, AnchorProvider, Idl } from "@coral-xyz/anchor";
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import solutioIdl from "@solutio/sdk/SolutioIDL.json";
+import solutioIdl from "@solutio/sdk/dist/SolutioIDL.json";
 import {
   getThreadPDA,
   airdrop,
@@ -13,6 +13,8 @@ import {
   cancelPaymentIx,
   delegateTransferAuthorityIx,
   convertStringToSchedule,
+  directTransferIx,
+  getProgramAsSignerPDA
 } from "@solutio/sdk";
 import { assert } from "chai";
 import {
@@ -20,6 +22,7 @@ import {
   createMint,
   getAccount,
   mintTo,
+  getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
 import "dotenv/config";
 import { sendTx } from "../utils";
@@ -31,9 +34,9 @@ describe("e2e thread tests", () => {
     AnchorProvider.env()
   );
 
-  it("deleagte -> setup -> update -> deposit -> cancel", async () => {
+  it("deleagte -> direct transfer -> setup -> update -> deposit -> cancel", async () => {
     const MINT_DECIMALS = 3;
-    const TA_BAL = new BN(100);
+    const TA_BAL = new BN(1000);
     const THREAD_ID = 0; // 0 is default first thread id
 
     const caller = Keypair.generate();
@@ -69,24 +72,44 @@ describe("e2e thread tests", () => {
       receiver.publicKey
     );
 
+    const [programSigner] = getProgramAsSignerPDA();
+    await getOrCreateAssociatedTokenAccount(
+      program.provider.connection,
+      caller,
+      mint,
+      programSigner,
+      true
+    );
+
     const [taAuth] = getTokenAuthPDA(caller.publicKey, ta, receiverTa);
     const [threadAuth] = getThreadAuthorityPDA(caller.publicKey);
     const [thread] = getThreadPDA(threadAuth, THREAD_ID);
 
-    await mintTo(program.provider.connection, caller, mint, ta, caller, TA_BAL.toNumber());
+    await mintTo(program.provider.connection, caller, mint, ta, caller, TA_BAL.muln(Math.pow(10, MINT_DECIMALS)).toNumber());
 
     const ix1 = await delegateTransferAuthorityIx(
       {
         taOwner: caller.publicKey,
-      receiver: receiver.publicKey,
-      mint,
-      delegateAmount: TA_BAL,
-      program
-    }
+        receiver: receiver.publicKey,
+        mint,
+        delegateAmount: TA_BAL,
+        program
+      }
     );
 
     await sendTx(program.provider.connection, [ix1], [caller]);
     await sleep(1);
+
+    const ix1_5 = await directTransferIx({
+        taOwner: caller.publicKey,
+        receiver: receiver.publicKey,
+        mint,
+        amount,
+        program
+    });
+
+    await sendTx(program.provider.connection, [ix1_5], [caller]);
+
     const tknAcntData = await getAccount(program.provider.connection, ta);
 
     // assert(taAuth.equals(tknAcntData.delegate), "Incoreect delegate");
@@ -106,8 +129,7 @@ describe("e2e thread tests", () => {
       receiver: receiver.publicKey,
       mint,
       transferAmount: amount,
-      threadId: THREAD_ID,
-      threadTrigger: convertStringToSchedule("Daily"),
+      threadTrigger: convertStringToSchedule("Immediate"),
       program
     });
 

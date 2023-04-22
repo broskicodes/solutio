@@ -1,6 +1,6 @@
 use crate::{
     error::SolutioError,
-    state::{AcceptedTriggers, Payment, ThreadAuthority, TokenAuthority},
+    state::{AcceptedTriggers, Payment, ThreadAuthority, TokenAuthority, PROGRAM_AS_SIGNER_SEED},
     util::verify_trigger,
 };
 use anchor_lang::{prelude::*, InstructionData};
@@ -10,7 +10,7 @@ use anchor_spl::{
 };
 use clockwork_sdk::{
     cpi::{thread_update, ThreadUpdate},
-    state::{SerializableAccount, SerializableInstruction, ThreadSettings},
+    state::{SerializableAccount, SerializableInstruction, ThreadSettings, Thread},
     ThreadProgram,
 };
 use clockwork_thread_program::{state::SEED_THREAD, ID as THREAD_PROGRAM_ID};
@@ -49,7 +49,7 @@ pub struct UpadtePayment<'info> {
         bump,
         seeds::program = THREAD_PROGRAM_ID
     )]
-    pub thread: UncheckedAccount<'info>,
+    pub thread: Box<Account<'info, Thread>>,
     pub thread_program: Program<'info, ThreadProgram>,
     pub system_program: Program<'info, System>,
     #[account(
@@ -78,6 +78,17 @@ pub struct UpadtePayment<'info> {
     )]
     pub receiver_token_account: Option<Box<Account<'info, TokenAccount>>>,
     pub receiver: Option<SystemAccount<'info>>,
+    #[account(
+        seeds = [PROGRAM_AS_SIGNER_SEED],
+        bump
+    )]
+    pub program_as_signer: Option<SystemAccount<'info>>,
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = program_as_signer,
+    )]
+    pub program_token_account: Option<Box<Account<'info, TokenAccount>>>,
     pub token_program: Option<Program<'info, Token>>,
     pub associated_token_program: Option<Program<'info, AssociatedToken>>,
 }
@@ -122,54 +133,63 @@ pub fn handler(
     let new_ixs = match new_transfer_amount {
         Some(amnt) => {
             ctx.accounts.payment.amount = amnt;
-            let ix_data = crate::instruction::TransferTokens { amount: amnt };
+            let ix_data = crate::instruction::TransferTokensViaAuthority { amount: amnt };
 
-            let acnts = crate::token::TransferTokens {
+            let acnts = crate::accounts::TransferTokensViaAuthority {
                 token_account_authority: ctx
                     .accounts
                     .token_account_authority
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
                 mint: ctx
                     .accounts
                     .mint
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
                 token_account: ctx
                     .accounts
                     .token_account
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
                 receiver_token_account: ctx
                     .accounts
                     .receiver_token_account
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
-                token_account_owner: UncheckedAccount::try_from(
-                    ctx.accounts.token_account_owner.clone().to_account_info(),
-                ),
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
+                token_account_owner: ctx.accounts.token_account_owner.key(),
                 receiver: ctx
                     .accounts
                     .receiver
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
-                system_program: ctx.accounts.system_program.clone(),
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
+                signing_thread: ctx.accounts.thread.key(),
+                program_as_signer: ctx
+                    .accounts
+                    .program_as_signer
+                    .clone()
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
+                program_token_account: ctx
+                    .accounts
+                    .program_token_account
+                    .clone()
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
+                system_program: ctx.accounts.system_program.key(),
                 token_program: ctx
                     .accounts
                     .token_program
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
                 associated_token_program: ctx
                     .accounts
                     .associated_token_program
                     .clone()
-                    .ok_or(SolutioError::MissingOptionalAccount)?,
+                    .ok_or(SolutioError::MissingOptionalAccount)?.key(),
             }
             .to_account_metas(None)
             .into_iter()
             .map(|meta| SerializableAccount {
                 pubkey: meta.pubkey,
-                is_signer: false,
+                is_signer: meta.pubkey.eq(&ctx.accounts.thread.key()),
                 is_writable: meta.is_writable,
             })
             .collect();

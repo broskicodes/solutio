@@ -10,7 +10,7 @@ use crate::state::TokenAuthority;
 #[derive(Accounts)]
 pub struct DelegateTransferAuthority<'info> {
     #[account(
-        init,
+        init, // Possibly change to init_if_needed
         payer = token_account_owner,
         space = TokenAuthority::LEN,
         seeds = [
