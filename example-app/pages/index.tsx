@@ -42,7 +42,7 @@ const Home: NextPage = () => {
 
       return () => clearInterval(intervalId);
     }
-  }, [didPurchaseDog]);
+  }, [didPurchaseDog, tkn]);
 
   useEffect(() => {
     if (didPurchaseCat) {
@@ -56,7 +56,7 @@ const Home: NextPage = () => {
 
       return () => clearInterval(intervalId);
     }
-  }, [didPurchaseCat]);
+  }, [didPurchaseCat, tkn]);
 
   useEffect(() => {
     setTkn(Math.random().toString());
