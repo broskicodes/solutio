@@ -9,6 +9,7 @@ import {
   getProgramAsSignerPDA,
   getNextThreadId,
 } from "../utils";
+import { BN } from "@coral-xyz/anchor";
 
 export const setupPaymentIx = async ({
   taOwner,
@@ -19,7 +20,7 @@ export const setupPaymentIx = async ({
   program,
 }: SetupPaymentParmas) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner);
-  const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  const receiverTa = await getAssociatedTokenAddress(mint, receiver, true);
   const mintData = await getMint(program.provider.connection, mint);
 
   const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
@@ -35,7 +36,7 @@ export const setupPaymentIx = async ({
 
   const ix = await program.methods
     .setupNewPayment(
-      transferAmount.muln(Math.pow(10, mintData.decimals)),
+      new BN(transferAmount * Math.pow(10, mintData.decimals)),
       threadTrigger
     )
     .accounts({

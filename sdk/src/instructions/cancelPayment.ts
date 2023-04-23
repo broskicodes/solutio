@@ -16,7 +16,7 @@ export const cancelPaymentIx = async ({
   program,
 }: CancelPaymentParams) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner);
-  const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  const receiverTa = await getAssociatedTokenAddress(mint, receiver, true);
 
   const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
   const [threadAuth] = getThreadAuthorityPDA(taOwner);

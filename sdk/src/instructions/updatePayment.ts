@@ -8,6 +8,7 @@ import {
   getTokenAuthPDA,
   getProgramAsSignerPDA,
 } from "../utils";
+import { BN } from "@coral-xyz/anchor";
 
 export const updatePaymentIx = async ({
   taOwner,
@@ -19,11 +20,12 @@ export const updatePaymentIx = async ({
   newSchedule,
 }: UpdatePaymentParams) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner);
-  const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  const receiverTa = await getAssociatedTokenAddress(mint, receiver, true);
 
+  let bnAmount: BN | null = null;
   if (newAmount) {
     const mintData = await getMint(program.provider.connection, mint);
-    newAmount = newAmount.muln(Math.pow(10, mintData.decimals));
+    bnAmount = new BN(newAmount * Math.pow(10, mintData.decimals));
   }
 
   const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
@@ -41,7 +43,7 @@ export const updatePaymentIx = async ({
         receiverTokenAccount: receiverTa,
         receiver,
         programAsSigner: programSigner,
-        programTokenAccount: programTa
+        programTokenAccount: programTa,
       }
     : {
         tokenAccountAuthority: undefined,
@@ -50,11 +52,11 @@ export const updatePaymentIx = async ({
         receiverTokenAccount: undefined,
         receiver: undefined,
         programAsSigner: undefined,
-        programTokenAccount: undefined
+        programTokenAccount: undefined,
       };
 
   const ix = await program.methods
-    .updatePayment(threadId, newSchedule, newAmount)
+    .updatePayment(threadId, newSchedule, bnAmount)
     .accounts({
       threadAuthority: threadAuth,
       payment,

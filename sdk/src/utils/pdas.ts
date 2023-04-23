@@ -52,5 +52,8 @@ export const getPaymentPDA = (taOwner: PublicKey, threadKey: PublicKey) => {
 };
 
 export const getProgramAsSignerPDA = () => {
-  return PublicKey.findProgramAddressSync([PROGRAM_AS_SIGNER_SEED], SOLUTIO_PROGRAM_ID);
-}
+  return PublicKey.findProgramAddressSync(
+    [PROGRAM_AS_SIGNER_SEED],
+    SOLUTIO_PROGRAM_ID
+  );
+};
