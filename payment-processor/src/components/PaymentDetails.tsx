@@ -1,4 +1,4 @@
-import { constructSetupIxQR, convertStringToSchedule, delegateTransferAuthorityIx, directTransferIx, getNextThreadId, getProgramAsSignerPDA, getThreadAuthorityPDA, setupPaymentIx, signAndSendTransaction, SOLUTIO_PROGRAM_ID } from "@solutio/sdk";
+import { constructSetupIxQR, convertStringToSchedule, delegateTransferAuthorityIx, directTransferIx, EXAMPLE_SERVER_URL, setupPaymentIx, signAndSendTransaction, SOLUTIO_PROGRAM_ID } from "@solutio/sdk";
 import { useEffect, useRef, useState } from "react";
 import { useAnchorProgram } from "../hooks/solana-hooks";
 import { TransactionInstruction, PublicKey } from "@solana/web3.js";
@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 
 interface ExpectedPaymentParams {
   appName: string;
+  id: string;
   msg?: string | null;
   receiver: string;
   mint: string;
@@ -16,14 +17,14 @@ interface ExpectedPaymentParams {
   delegateAmount?: number;
 }
 
-//http://localhost:3000/?appName=Example&receiver=BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt&mint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=1
+//?appName=Example&receiver=BtdMgTGPjwyaoXYjyniQ9FdUWjPXJkFArCAN61Ectubt&mint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=1&id=1
 
 export const PaymentDetails = () => {
   const program = useAnchorProgram();
   const qrRef = useRef<HTMLDivElement>(null);
   const { search } = useLocation();
   const [params, setParams] = useState<ExpectedPaymentParams>();
-  const txSigRef = useRef<string | undefined>('');
+  // const txSigRef = useRef<string | undefined>('');
 
   const warnUser = () => {
     alert(`
@@ -41,6 +42,8 @@ export const PaymentDetails = () => {
     }
 
     const {
+      id,
+      msg,
       receiver,
       mint,
       amount,
@@ -58,7 +61,7 @@ export const PaymentDetails = () => {
         taOwner: taOwnerKey,
         receiver: receiverKey,
         mint: mintKey,
-        delegateAmount: new BN(delegateAmount ?? amount * 6), // Create var in sdk for default subscription period
+        delegateAmount: delegateAmount ?? amount * 6, // Create var in sdk for default subscription period
         program
       }));
     }
@@ -69,23 +72,28 @@ export const PaymentDetails = () => {
             taOwner: taOwnerKey,
             receiver: receiverKey,
             mint: mintKey,
-            amount: new BN(amount),
+            amount: amount,
             program
           })
         : await setupPaymentIx({
           taOwner: taOwnerKey,
           receiver: receiverKey,
           mint: mintKey,
-          transferAmount: new BN(amount),
+          transferAmount: amount,
           threadTrigger: convertStringToSchedule(threadSchedule),
           program
         })
     );
 
     const txSig = await signAndSendTransaction(ixs, program.provider);
-    txSigRef.current = txSig;
+
     console.log(txSig);
-    // Need to verify sig was confirmed and send response to client
+    // Hard code api url until I can fetch by appName/addId
+    await fetch(`${EXAMPLE_SERVER_URL}/api/isPaymentProcessed?id=${id}&token=${msg}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ txSig })
+    });
   }
   
 
@@ -122,6 +130,7 @@ export const PaymentDetails = () => {
 
     setParams({
       appName: queryParams.get('appName') as string,
+      id: queryParams.get('id') as string,
       receiver: queryParams.get('receiver') as string,
       mint: queryParams.get('mint') as string,
       amount: Number(queryParams.get('amount')),
@@ -130,7 +139,7 @@ export const PaymentDetails = () => {
       msg: queryParams.get('msg'),
     })
 
-  }, [])
+  }, [search])
   
   return (
     <div>

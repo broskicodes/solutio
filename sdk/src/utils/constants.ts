@@ -22,3 +22,4 @@ export const COMPUTE_BUDGET_PROGRAM_ID = new PublicKey(
 export const NEXT_THREAD_ID_INDEX = 8 + 32;
 export const SOLANA_PAY_SERVER_URL = "https://sps.solutioapp.xyz";
 export const PAYMENTS_SERVER_URL = "https://payments.solutioapp.xyz";
+export const EXAMPLE_SERVER_URL = "https://example.solutioapp.xyz";

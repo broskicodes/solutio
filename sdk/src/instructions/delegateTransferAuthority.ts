@@ -1,5 +1,6 @@
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
 import { DelegateTransferAuthorityParams, getTokenAuthPDA } from "../utils";
+import { BN } from "@coral-xyz/anchor";
 
 export const delegateTransferAuthorityIx = async ({
   taOwner,
@@ -9,14 +10,14 @@ export const delegateTransferAuthorityIx = async ({
   program,
 }: DelegateTransferAuthorityParams) => {
   const ta = await getAssociatedTokenAddress(mint, taOwner);
-  const receiverTa = await getAssociatedTokenAddress(mint, receiver);
+  const receiverTa = await getAssociatedTokenAddress(mint, receiver, true);
   const mintData = await getMint(program.provider.connection, mint);
 
   const [taAuth] = getTokenAuthPDA(taOwner, ta, receiverTa);
 
   const ix = await program.methods
     .delegateTransferAuthority(
-      delegateAmount.muln(Math.pow(10, mintData.decimals))
+      new BN(delegateAmount * Math.pow(10, mintData.decimals))
     )
     .accounts({
       newAuthority: taAuth,
