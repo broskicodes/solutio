@@ -1,18 +1,29 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
 import { PaymentDetails } from '@/components/PaymentDetails'
 import { Wallet } from '@/components/Wallet'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
+import { config } from "dotenv";
 
-const inter = Inter({ subsets: ['latin'] })
+export const getServerSideProps = async () => {
+  config();
 
-export default function Home() {
+  return { props: {
+    rpcUrl: process.env.MAINNET_RPC_URL,
+    wsUrl: process.env.MAINNET_WSS_URL
+  }}
+}
+
+interface Props {
+  rpcUrl: string,
+  wsUrl: string
+}
+
+export default function PaymentPage({ rpcUrl, wsUrl }: Props) {
   return (
     <div className="App">
-      <Wallet network={WalletAdapterNetwork.Mainnet}>
-        <Router>
+      <Wallet network={WalletAdapterNetwork.Mainnet} rpcUrl={rpcUrl} wsUrl={wsUrl} >
+        {/* <Router>
           <PaymentDetails />
-        </Router>
+        </Router> */}
       </Wallet>
     </div>
   )

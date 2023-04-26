@@ -13,14 +13,16 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 
 interface WalletProps {
   network: WalletAdapterNetwork,
+  rpcUrl: string,
+  wsUrl: string,
   children: JSX.Element | JSX.Element[] | null
 }
 
-export const Wallet = ({ children, network }: WalletProps) => {
+export const Wallet = ({ children, network, rpcUrl, wsUrl }: WalletProps) => {
     const { endpoint, config } =  
        useMemo(() => {
         return network === "mainnet-beta"
-          ? { endpoint: process.env.REACT_APP_MAINNET_RPC_URL, config: { wsEndpoint: process.env.REACT_APP_MAINNET_WSS_URL } }
+          ? { endpoint: rpcUrl, config: { wsEndpoint: wsUrl } }
           : { endpoint: clusterApiUrl(network), config: {} }
       }, [network]);
 
