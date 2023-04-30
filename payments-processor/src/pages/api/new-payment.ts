@@ -1,4 +1,4 @@
-import { validateApiKey } from "@/server-middleware/api";
+// import { validateApiKey } from "@/server-middleware/api";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const handler = (
@@ -9,7 +9,7 @@ const handler = (
 
   switch (req.method) {
     case "GET":
-      validateApiKey(req, res);
+      // validateApiKey(req, res);
       res.status(200).send("good")
       break;
     case "POST": {

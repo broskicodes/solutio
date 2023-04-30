@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { findApiKeyEntry } from "./db";
+// import { findApiKeyEntry } from "./db";
 import { handleError } from "./error";
 
 export const generateApiKey = () => {
@@ -8,17 +8,17 @@ export const generateApiKey = () => {
     .join('');
 }
 
-export const validateApiKey = (req: NextApiRequest, res: NextApiResponse) => {
-  const providedKey = req.headers.authorization;
-  const origin = req.headers.origin;
+// export const validateApiKey = (req: NextApiRequest, res: NextApiResponse) => {
+//   const providedKey = req.headers.authorization;
+//   const origin = req.headers.origin;
 
-  console.log(origin);
+//   console.log(origin);
 
-  if(!providedKey || !origin) {
-    handleError(res, "Unauthorized", 401);
-    return;
-  }
+//   if(!providedKey || !origin) {
+//     handleError(res, "Unauthorized", 401);
+//     return;
+//   }
 
-  findApiKeyEntry(providedKey);
+//   findApiKeyEntry(providedKey, res);
 
-}
+// }

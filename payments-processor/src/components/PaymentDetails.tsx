@@ -1,6 +1,6 @@
 import { constructSetupIxQR, convertStringToSchedule, delegateTransferAuthorityIx, directTransferIx, EXAMPLE_SERVER_URL, setupPaymentIx, signAndSendTransaction, SOLUTIO_PROGRAM_ID } from "@solutio/sdk";
 import { useEffect, useRef, useState } from "react";
-import { useAnchorProgram } from "../hooks/solana-hooks";
+import { useAnchorProgram } from "@/hooks/solana-hooks";
 import { TransactionInstruction, PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import { ConvertableString } from "@solutio/sdk";

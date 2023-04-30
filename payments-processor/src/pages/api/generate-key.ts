@@ -1,10 +1,11 @@
-import { addNewApiKeyRecord } from "@/server-middleware/db";
+import { addNewApiKeyRecord, connectDB } from "@/server-middleware/db";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const handler = (
+const handler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
+  await connectDB();
   console.log(req.method)
 
   switch (req.method) {
@@ -12,8 +13,7 @@ const handler = (
       res.status(200).send("Pong");
       break;
     case "POST": {
-      const apiKey = addNewApiKeyRecord(req, res);
-      res.send(apiKey);
+      await addNewApiKeyRecord(req, res);
       break;
     }
     default:
