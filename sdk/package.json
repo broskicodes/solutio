@@ -1,7 +1,7 @@
 {
   "name": "@solutio/sdk",
   "type": "commonjs",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "repository": "https://github.com/nibbus0x/solutio",
