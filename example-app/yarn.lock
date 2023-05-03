@@ -267,10 +267,10 @@
     rpc-websockets "^7.5.1"
     superstruct "^0.14.2"
 
-"@solutio/sdk@^0.3.4":
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/@solutio/sdk/-/sdk-0.3.4.tgz#9f4535d9b463d354a2646500795b4336d8348817"
-  integrity sha512-0u7BJebHyLv71u5a2cDGJyWnEh+xxz13afagxV/49kVUi1Tn9MIA76csSsX2j7C5HOR165FPCHTzY5+bhakaAA==
+"@solutio/sdk@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@solutio/sdk/-/sdk-0.4.0.tgz#fe55bcb2305e5b0606825a703b77c432e55f7e55"
+  integrity sha512-RiKs+EL6sws/LnupNfkGKSboy6BwaZ7zU+IvHd7BqBIAdz0hTl7+gQiZV+bywpDEbqSugFipmdchYJrgh8YXrg==
   dependencies:
     "@coral-xyz/anchor" "^0.27.0"
     "@solana/pay" "^0.2.5"
@@ -795,6 +795,11 @@ dot-case@^3.0.4:
   dependencies:
     no-case "^3.0.4"
     tslib "^2.0.3"
+
+dotenv@^16.0.3:
+  version "16.0.3"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.3.tgz#115aec42bac5053db3c456db30cc243a5a836a07"
+  integrity sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==
 
 emoji-regex@^9.2.2:
   version "9.2.2"
