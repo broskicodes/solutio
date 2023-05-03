@@ -1,66 +1,49 @@
 import type { NextPage } from 'next'
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { IPFSDownload } from '../components/IpfsDownload';
 import styles from '../styles/Home.module.css'
 import Link from 'next/link';
-import { PAYMENTS_SERVER_URL } from '@solutio/sdk';
+import { checkPaymentStatus, generateNewPaymentLink } from '@solutio/sdk';
+import { config } from 'dotenv';
 
-interface Pic {
-  id: number,
-  hash: string,
-  filename: string,
-  price: number
+export const getServerSideProps = async () => {
+  config();
+
+  return { props: {
+    apiKey: process.env.API_KEY
+  }}
+}
+
+interface Props {
+  apiKey: string,
 }
 
 const appName = "Example";
 const receiver = "AA8vwdxzGQfpKBfZmE2FmigiFx8qba8Q8fMHuHP2wcqT";
-const mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
-const Home: NextPage = () => {  
+const Home: NextPage<Props> = ({ apiKey }: Props) => {  
   const [canDwldDog, setCanDwldDog] = useState(false);
-  const [canDwldCat, setCanDwldCat] = useState(false);
-  const [didPurchaseDog, setDidPurchaseDog] = useState(false);
-  const [didPurchaseCat, setDidPurchaseCat] = useState(false);
-  const [tkn, setTkn] = useState<string>('')
-
-  const handleClick = ({ id }: Pic) => {
-    console.log(tkn)
-    id === 1 
-      ? setDidPurchaseDog(true)
-      : setDidPurchaseCat(true);
-  }
+  const [linkGenerated, setLinkGenerated] = useState(false);
+  const [paymentInit, setPaymentInit] = useState(false);
+  const [paymentUrl, setPaymnetUrl] = useState('');
+  const [paymentId, setPaymnetId] = useState('');
 
   useEffect(() => {
-    if (didPurchaseDog) {
+    if (!paymentId) {
+      return;
+    }
+    console.log("ki");
+
+    if (paymentInit) {
       const intervalId = setInterval(() => {
-        fetch(`api/isPaymentProcessed?id=1&token=${tkn}`)
-          .then((res) => res.json())
-          .then((data) => {
-            setCanDwldDog(data.processed);
+        checkPaymentStatus(apiKey, paymentId).then((data) => {
+            setCanDwldDog(!!data);
           });
       }, 5000);
 
       return () => clearInterval(intervalId);
     }
-  }, [didPurchaseDog, tkn]);
-
-  useEffect(() => {
-    if (didPurchaseCat) {
-      const intervalId = setInterval(() => {
-        fetch(`api/isPaymentProcessed?id=2&token=${tkn}`)
-          .then((res) => res.json())
-          .then((data) => {
-            setCanDwldCat(data.processed);
-          });
-      }, 5000);
-
-      return () => clearInterval(intervalId);
-    }
-  }, [didPurchaseCat, tkn]);
-
-  useEffect(() => {
-    setTkn(Math.random().toString());
-  }, []);
+  }, [paymentInit]);
 
   return (
     <div className={styles.container}>
@@ -81,13 +64,19 @@ const Home: NextPage = () => {
         </p>
         <div>
           {!canDwldDog 
-            ? <Link href={`${PAYMENTS_SERVER_URL}?id=${1}&appName=${appName}&receiver=${receiver}&mint=${mint}&amount=${0.15}&msg=${tkn}`} target="_blank" onClick={() => { handleClick({id: 1, filename: "mega.jpg", hash: "QmPdYY4D6XvoKC1uyXUMtyofcqrqxP9rLKty6ZJwzbeyU1", price: 0.15 }) }}>My brother's dog</Link>
+            ? !linkGenerated
+              ? <button onClick={async () => {
+                const data = await generateNewPaymentLink(apiKey, appName, receiver, 0.01);
+
+                setPaymnetUrl(data.url);
+                setPaymnetId(data.id);
+                setLinkGenerated(true);
+                // console.log(data);
+              }}>Dog</button>
+              : <button onClick={({ clientX, clientY }) => {
+                window.open(paymentUrl, 'Popup', `width=450, height=500, left=${clientX}, top=${clientY}`);
+              }}>Pay</button>
             : <IPFSDownload filename='mega.jpg' hash='QmPdYY4D6XvoKC1uyXUMtyofcqrqxP9rLKty6ZJwzbeyU1' />
-          }
-          <p>Or</p>
-          {!canDwldCat 
-            ? <Link href={`${PAYMENTS_SERVER_URL}?id=${2}&appName=${appName}&receiver=${receiver}&mint=${mint}&amount=${0.10}&msg=${tkn}`} target="_blank" onClick={() => { handleClick({id: 2, filename: "heero.jpg", hash: "QmS2PWCxFEjbUnMPCUb6bBHupoYiZQbJNx9SGBhFuhHTZ5", price: 0.10 }) }}>My brother's cat</Link>
-            : <IPFSDownload filename='heero.jpg' hash='QmS2PWCxFEjbUnMPCUb6bBHupoYiZQbJNx9SGBhFuhHTZ5' />
           }
         </div>
         <p>
@@ -101,7 +90,7 @@ const Home: NextPage = () => {
         <h2>Socials</h2>
         <div>
           <p>For any questions, comments or concerns please reach out to me on</p>
-          <Link href={"https://twitter.com/nibbus0x"} target="_blank" >twitter</Link>
+          <Link href={"https://twitter.com/_broskitweets"} target="_blank" >twitter</Link>
           <p>Or if you are really keen to start building, have a look at the code on</p>
           <Link href={"https://github.com/nibbus0x/solutio"} target="_blank">github</Link>
         </div>
