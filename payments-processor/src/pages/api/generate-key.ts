@@ -1,4 +1,4 @@
-import { addNewApiKeyRecord, connectDB } from "@/server-middleware/db";
+import { addNewApiKeyRecord, connectDB } from "@/middleware/db";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const handler = async (
@@ -9,15 +9,12 @@ const handler = async (
   console.log(req.method)
 
   switch (req.method) {
-    case "GET":
-      res.status(200).send("Pong");
-      break;
     case "POST": {
       await addNewApiKeyRecord(req, res);
       break;
     }
     default:
-      res.status(403).send("Action not permitted");
+      res.status(405).send("Action not permitted");
   }
 }
 

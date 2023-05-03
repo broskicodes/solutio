@@ -1,7 +1,6 @@
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useState } from "react";
 
-
 export const KeyGeneration = () => {
   const { publicKey } = useWallet();
   const [host, setHost] = useState('');
@@ -26,9 +25,9 @@ export const KeyGeneration = () => {
             })
           });
 
-          res.json().then((key) => { 
-            console.log(key)
-            setApiKey(key) 
+          res.json().then(({ apiKey }) => { 
+            console.log(apiKey)
+            setApiKey(apiKey) 
           });
         }}>Generate</button>
         </div>
